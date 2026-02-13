@@ -2,6 +2,9 @@
 
 Windows MFC HID 測試工具（64-byte payload），用於送命令、收回應、驗證 Echo / Handshake 流程。
 
+
+![image](https://github.com/released/HidTestTool/blob/main/main_window.jpg) 
+
 ## Build
 
 ```bat
