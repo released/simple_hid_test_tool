@@ -106,17 +106,16 @@ int CDeviceBar::OnCreate(LPCREATESTRUCT lpCreateStruct) {
     m_capTitle.Create(L"Device Capability:", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
     m_capVidPid.Create(L"VID:PID        : 0x---- : 0x----", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
     m_capUsage.Create(L"UsagePage/Usage: 0x---- / 0x----", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
-    m_capReports.Create(L"Reports        : IN=--  OUT=--  FEAT=--", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
+    m_capReports.Create(L"Reports        : IN=--  OUT=--  FEAT=--  ReportID=0x00", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
 
     m_statusLabel.Create(L"Status: Disconnected", WS_CHILD | WS_VISIBLE | SS_RIGHT, CRect(0, 0, 0, 0), this);
-    m_reportHintLabel.Create(L"Report Format: [ReportID][64-byte payload]", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
     m_copyButton.Create(L"Copy Device Info", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
                         CRect(0, 0, 0, 0), this, kCopyId);
 
     CWnd* controls[] = {
         &m_deviceCombo, &m_scanButton, &m_connectButton, &m_autoReconnectCheck,
         &m_capTitle, &m_capVidPid, &m_capUsage, &m_capReports,
-        &m_statusLabel, &m_reportHintLabel, &m_copyButton
+        &m_statusLabel, &m_copyButton
     };
     for (CWnd* control : controls) {
         control->SetFont(&m_uiFont);
@@ -147,7 +146,6 @@ int CDeviceBar::OnCreate(LPCREATESTRUCT lpCreateStruct) {
     m_tooltip.AddTool(&m_copyButton, L"Copy device capability info to clipboard");
 
     UpdateStatusText();
-    UpdateReportHint();
 
     return 0;
 }
@@ -165,7 +163,7 @@ void CDeviceBar::LayoutControls(int cx, int cy) {
     const int button_width = 110;
     const int auto_width = 140;
     const int status_width = 160;
-    const int text_height = 18;
+    const int text_height = 22;
 
     int width = cx - margin * 2;
     if (width < 0) {
@@ -214,30 +212,40 @@ void CDeviceBar::LayoutControls(int cx, int cy) {
     m_statusLabel.MoveWindow(status_x + 16, y + 4, status_width - 16, text_height);
 
     int y2 = y + row_height + gap;
-    int left_width = static_cast<int>(width * 0.15);
-    int right_x = margin + left_width + gap;
-    int right_width = width - left_width - gap;
-    if (right_width < 160) {
-        right_width = 160;
-        left_width = width - right_width - gap;
-        right_x = margin + left_width + gap;
+    const int copy_width = 160;
+    const int report_margin_px = 10;
+    int required_cap_width = 0;
+    {
+        CClientDC dc(this);
+        CFont* old_font = dc.SelectObject(&m_uiFont);
+        required_cap_width = dc.GetTextExtent(L"Reports        : IN=64  OUT=64  FEAT=0  ReportID=0x00").cx + report_margin_px;
+        dc.SelectObject(old_font);
     }
 
-    const int line_gap = text_height + 7;
-    m_capTitle.MoveWindow(margin, y2, left_width, text_height);
-    m_capVidPid.MoveWindow(margin, y2 + line_gap, left_width, text_height);
-    m_capUsage.MoveWindow(margin, y2 + line_gap * 2, left_width, text_height);
-    m_capReports.MoveWindow(margin, y2 + line_gap * 3, left_width, text_height);
-    m_reportHintLabel.MoveWindow(margin, y2 + line_gap * 4, width, text_height);
+    int max_left_width = width - copy_width - gap;
+    if (max_left_width < 180) {
+        max_left_width = width;
+    }
 
-    const int copy_width = 160;
-    int copy_x = margin + left_width;
+    int left_width = required_cap_width;
+    if (left_width > max_left_width) {
+        left_width = max_left_width;
+    }
+
+    int copy_x = margin + left_width + gap;
     if (copy_x + copy_width > margin + width) {
         copy_x = margin + width - copy_width;
     }
     if (copy_x < margin) {
         copy_x = margin;
     }
+
+    const int line_gap = text_height + 6;
+    m_capTitle.MoveWindow(margin, y2, left_width, text_height);
+    m_capVidPid.MoveWindow(margin, y2 + line_gap, left_width, text_height);
+    m_capUsage.MoveWindow(margin, y2 + line_gap * 2, left_width, text_height);
+    m_capReports.MoveWindow(margin, y2 + line_gap * 3, left_width, text_height);
+
     m_copyButton.MoveWindow(copy_x, y2, copy_width, row_height);
 }
 
@@ -315,15 +323,6 @@ HBRUSH CDeviceBar::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) {
             pDC->SetTextColor(RGB(241, 245, 249));
             pDC->SetBkColor(RGB(55, 65, 81));
             return m_vidPidHighlightBrush;
-        }
-        if (pWnd->GetSafeHwnd() == m_reportHintLabel.GetSafeHwnd()) {
-            if (m_reportId != 0x00) {
-                pDC->SetTextColor(RGB(249, 115, 22));
-            } else {
-                pDC->SetTextColor(RGB(15, 23, 42));
-            }
-            pDC->SetBkMode(TRANSPARENT);
-            return brush;
         }
         if (pWnd->GetSafeHwnd() == m_statusLabel.GetSafeHwnd()) {
             pDC->SetTextColor(RGB(30, 30, 35));
@@ -547,7 +546,7 @@ void CDeviceBar::SetConnectionState(int state) {
 
 void CDeviceBar::SetReportId(unsigned char report_id) {
     m_reportId = report_id;
-    UpdateReportHint();
+    UpdateCapabilityText();
     InvalidateRect(nullptr, FALSE);
 }
 
@@ -558,13 +557,15 @@ bool CDeviceBar::IsAutoReconnectEnabled() const {
 void CDeviceBar::UpdateCapabilityText() {
     int sel = SelectedIndex();
     if (sel < 0 || sel >= static_cast<int>(m_devices.size())) {
+        wchar_t buffer[160] = {};
         m_capVidPid.SetWindowTextW(L"VID:PID        : 0x---- : 0x----");
         m_capUsage.SetWindowTextW(L"UsagePage/Usage: 0x---- / 0x----");
-        m_capReports.SetWindowTextW(L"Reports        : IN=--  OUT=--  FEAT=--");
+        swprintf_s(buffer, L"Reports        : IN=--  OUT=--  FEAT=--  ReportID=0x%02X", m_reportId);
+        m_capReports.SetWindowTextW(buffer);
         return;
     }
     const HidScanInfo& info = m_devices[static_cast<size_t>(sel)];
-    wchar_t buffer[128] = {};
+    wchar_t buffer[160] = {};
     swprintf_s(buffer, L"VID:PID        : 0x%04X : 0x%04X", info.vendor_id, info.product_id);
     m_capVidPid.SetWindowTextW(buffer);
     swprintf_s(buffer, L"UsagePage/Usage: 0x%04X / 0x%04X", info.usage_page, info.usage);
@@ -573,17 +574,10 @@ void CDeviceBar::UpdateCapabilityText() {
     unsigned short in_len = PayloadLength(info.input_report_length);
     unsigned short out_len = PayloadLength(info.output_report_length);
     unsigned short feat_len = PayloadLength(info.feature_report_length);
-    swprintf_s(buffer, L"Reports        : IN=%u  OUT=%u  FEAT=%u", in_len, out_len, feat_len);
+    swprintf_s(buffer, L"Reports        : IN=%u  OUT=%u  FEAT=%u  ReportID=0x%02X", in_len, out_len, feat_len, m_reportId);
     m_capReports.SetWindowTextW(buffer);
 }
 
-void CDeviceBar::UpdateReportHint() {
-    if (m_reportId != 0x00) {
-        m_reportHintLabel.SetWindowTextW(L"Report Format: [ReportID][64-byte payload]  (ReportID != 0x00)");
-    } else {
-        m_reportHintLabel.SetWindowTextW(L"Report Format: [ReportID][64-byte payload]");
-    }
-}
 
 void CDeviceBar::UpdateStatusText() {
     const wchar_t* text = L"Status: Disconnected";
@@ -641,4 +635,3 @@ std::wstring CDeviceBar::BuildDeviceSummary() const {
     ss << info.path_hash;
     return ss.str();
 }
-

@@ -53,7 +53,6 @@ private:
     void LayoutControls(int cx, int cy);
     void UpdateCombo();
     void UpdateCapabilityText();
-    void UpdateReportHint();
     void UpdateStatusText();
     void NotifyParent(Action action);
     std::wstring BuildDeviceSummary() const;
@@ -67,7 +66,6 @@ private:
     CStatic m_capUsage;
     CStatic m_capReports;
     CStatic m_statusLabel;
-    CStatic m_reportHintLabel;
     CButton m_copyButton;
     std::wstring m_statusText;
     std::vector<HidScanInfo> m_devices;

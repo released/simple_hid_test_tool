@@ -77,11 +77,11 @@
 - Capability summary (read-only):
   - `VID:PID`
   - `UsagePage/Usage`
-  - `Reports IN/OUT/FEAT` (payload lengths, excludes ReportID byte)
+  - `Reports IN/OUT/FEAT + ReportID` (payload lengths exclude ReportID byte)
   - `VID:PID` row uses a highlighted contrast background for quick visual identification
-- Report format hint:
-  - `Report Format: [ReportID][64-byte payload]`
-  - If ReportID != 0x00, show warning text `(ReportID != 0x00)` and red color
+- Report hint row is removed
+- Capability text rows use larger line spacing to avoid top/bottom clipping
+- Capability text block width is auto-sized to fit the Reports row text + 10px margin
 - `Copy Device Info` button:
   - Located on the right side of the capability block
   - Clipboard content:

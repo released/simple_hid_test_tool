@@ -158,6 +158,8 @@ On startup:
 - Device list format: `VID:PID  IN:xx OUT:xx  [Manufacturer - Product]`
 - `VID:PID` capability row has contrast highlight for quick identification.
 - If multiple HID devices exist, verify `UsagePage/Usage` before connect.
+- `Reports` row includes `IN/OUT/FEAT` and current `ReportID=0xNN`.
+- Separate Report hint row is removed.
 
 ## TX Panel Notes
 

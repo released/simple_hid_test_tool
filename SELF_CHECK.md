@@ -71,12 +71,14 @@ Result: PASS / FAIL
 
 Result: PASS / FAIL
 
-[DB-06] ReportID warning hint
-- Set ReportID to 0x00:
-  - Hint shows "Report Format: [ReportID][64-byte payload]"
-- Set ReportID to non-zero (e.g., 0x01):
-  - Hint appends "(ReportID != 0x00)"
-  - Hint text turns red
+[DB-06] Reports row includes ReportID
+- Select a device and verify capability row shows:
+  - `Reports        : IN=<x>  OUT=<y>  FEAT=<z>  ReportID=0xNN`
+- Change ReportID (e.g., 0x00 -> 0x01)
+- Verify `ReportID=0xNN` updates immediately in the Reports row
+- Verify no extra Report hint row is shown below capability lines
+- Verify capability text lines are fully visible (no top/bottom clipping)
+- Verify capability text block width is not over-stretched (fits Reports row with small extra margin)
 
 Result: PASS / FAIL
 
