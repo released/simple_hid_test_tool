@@ -23,6 +23,7 @@ public:
     bool GetLastPayload(std::vector<unsigned char>* out_payload);
     bool GetLastPayloadHex(std::wstring* out_text);
     void LogTxLine(const std::wstring& line);
+    void PushExternalPayload(const std::vector<unsigned char>& payload);
 
     bool IsLogEnabled() const;
     bool IsTimestampEnabled() const;

@@ -20,7 +20,7 @@ public:
                       WS_POPUP | WS_VISIBLE, x, y, width, height, nullptr, 0)) {
             return false;
         }
-        m_text = L"Initializing HID Test Tool...";
+        m_text = L"Initializing TCP Test Tool...";
         CClientDC dc(this);
         int font_height = -MulDiv(10, dc.GetDeviceCaps(LOGPIXELSY), 72);
         m_font.CreateFontW(font_height, 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, 0, DEFAULT_CHARSET,
@@ -58,10 +58,10 @@ END_MESSAGE_MAP()
 
 }
 
-BEGIN_MESSAGE_MAP(CHidTestToolApp, CWinApp)
+BEGIN_MESSAGE_MAP(CTcpTestToolApp, CWinApp)
 END_MESSAGE_MAP()
 
-BOOL CHidTestToolApp::InitInstance() {
+BOOL CTcpTestToolApp::InitInstance() {
     CWinApp::InitInstance();
 
     CStartupSplash splash;
@@ -70,7 +70,7 @@ BOOL CHidTestToolApp::InitInstance() {
     }
 
     auto* frame = new CMainFrame();
-    if (!frame->Create(nullptr, L"HID Test Tool", WS_OVERLAPPEDWINDOW, CRect(0, 0, 1024, 768))) {
+    if (!frame->Create(nullptr, L"TCP Test Tool", WS_OVERLAPPEDWINDOW, CRect(0, 0, 1180, 820))) {
         if (splash.GetSafeHwnd()) {
             splash.DestroyWindow();
         }
@@ -86,4 +86,3 @@ BOOL CHidTestToolApp::InitInstance() {
     }
     return TRUE;
 }
-

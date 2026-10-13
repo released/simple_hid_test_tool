@@ -1,75 +1,102 @@
-# HANDOFF.md
-Last updated: 2026-02-13
-Workspace: `d:\SourceCode\python\_HidTestTool`
+# TCPTestTool Handoff
 
----
+## Current Scope
 
-## Current Authority
-- Spec baseline: `AGENTS.md` (Current UI behavior is source of truth)
-- QA checklist: `SELF_CHECK.md`
-- Rule: Any feature behavior change must update both files in same round
+`TCPTestTool` is the PC-side client for the M480 lwIP TCP firmware update project.
 
----
+It was derived from the original HID desktop tool, but the active transport is now TCP.
 
-## Implemented In This Session
+## Implemented
 
-### 1) Startup busy feeling mitigation
-- Added lightweight pre-window splash (`Initializing HID Test Tool...`) to mask first-load busy time
-- Removed startup overlay inside main window (to avoid post-open flash)
-- Startup scan is deferred by timer after window creation
-- Startup device scan path uses lighter enumeration path
-- Files:
-  - `src/app.cpp`
-  - `src/main_frame.h`
-  - `src/main_frame.cpp`
-  - `src/ui/device_bar.cpp`
+- MFC desktop application builds as `TCPTestTool.exe`
+- Connection bar changed from device scan to `Host + Port + Connect + Ping`
+- Existing console TX/RX workflow retained
+- Legacy USB HID report / echo / handshake controls removed from the active console UI
+- TCP framed protocol added in `src\tcp\tcp_protocol.*`
+- `RAW64` command used for the console page
+- Firmware tab added for:
+  - browse firmware
+  - enter bootloader
+  - burn firmware
+  - reset MCU
+  - progress display
+- Function tab added for APP RAW64 packets:
+  - ADC `0xA0`
+  - GPIO `0xA1`
+  - PWM `0xA2`
+  - per-function sub-tabs and polling checkboxes
+  - per-function TX/RX raw data display
+- APP uptime polling added:
+  - `GET_UPTIME` is polled only in APP mode
+  - bootloader `GET_UPTIME` is treated as invalid state and should not be polled
+- Function tab button commands are dispatched by the background control-poll worker to avoid blocking the MFC UI thread.
+- TCP receive close path was hardened:
+  - socket close wakes blocked receive/poll operations
+  - receive buffers are cleared only under receive lock
+  - CRC mismatch is reported as CRC mismatch instead of being swallowed as timeout
+- RX capture pause no longer closes the TCP socket; firmware burn, ping, and reset commands can pause the RX thread without disconnecting.
+- The connection bar reports socket connection state separately from idle RX timeout so a quiet but open TCP connection still shows connected.
+- Function telemetry updates no longer overwrite pending GPIO output or PWM edit values during polling; write responses still synchronize accepted values.
+- ADC display fields use mV units to match ADC VREF.
+- Firmware failure reporting now separates:
+  - failure offset
+  - status
+  - transport error
+  - chunk size
+  - image size
+- Config persistence updated to:
+  - `TCPTestTool.ini`
+  - `TCPTestTool_commands.ini`
+  - `TCPTestTool_commands_default.ini`
+- RX log filename changed to `*_tcp_rx.log`
+- Runtime config no longer stores HID report / handshake / echo settings
 
-### 2) TX/RX log format and ordering cleanup
-- Unified log format:
-  - Timestamp ON: `[HH:MM:SS.mmm] [TX] [<hex>]` / `[HH:MM:SS.mmm] [RX] [<hex>]`
-  - Timestamp OFF: `[TX] [<hex>]` / `[RX] [<hex>]`
-- RX is logged at receive-time (worker path), not delayed by UI flush
-- Logger now mutex-protected for TX/RX concurrent writes
-- Files:
-  - `src/ui/rx_panel.h`
-  - `src/ui/rx_panel.cpp`
-  - `src/log/logger.h`
-  - `src/log/logger.cpp`
-  - `src/core/scheduler.h`
-  - `src/core/scheduler.cpp`
-  - `src/main_frame.cpp`
+## Important Compatibility Choice
 
-### 3) Command INI default behavior
-- First launch behavior:
-  - Runtime command file: `HidTestTool_commands.ini`
-  - If missing, it is created from current panel values
-  - Default snapshot file `HidTestTool_commands_default.ini` is created only if missing
-- `Load` button remains file-picker based (no forced template load)
-- Files:
-  - `src/config/command_config_manager.h`
-  - `src/config/command_config_manager.cpp`
-  - `src/main_frame.cpp`
+Some file and class names still use old `hid_*` naming:
 
----
+- `src\hid\hid_device.*`
+- `src\hid\hid_scan.*`
+- `src\TCPTestTool.rc`
+- `src\res\tcp.ico`
 
-## Build Verification
-- Command: `scripts\build_release.bat`
-- Result: success (`0 warning`, `0 error`) on 2026-02-13
-- Output:
-  - `build\HidTestTool.exe`
-  - `build\obj\x64\Release\HidTestTool.pdb`
-- Script behavior verified: rebuild + relaunch exe
+This was kept intentionally to reduce project churn while changing the runtime behavior to TCP.
 
----
+## MCU Contract
 
-## Document Sync Status
-- `AGENTS.md`: updated for startup splash + deferred startup scan + new log format
-- `SELF_CHECK.md`: updated with startup splash checks and new log format checks
-- `README.md`: updated to match current UI usage and logging style
+The tool expects the MCU TCP server to support the framed protocol shared by:
 
----
+- PC: `src\tcp\tcp_protocol.h`
+- MCU: `SampleCode\Template\tcp_tool_protocol.h`
+- MCU README: README in the MCU firmware repository.
 
-## Next Chat Quick Start
-1. Open `AGENTS.md` and follow current baseline.
-2. Validate by running `SELF_CHECK.md` cases.
-3. If startup still feels slow, next step is to profile heavy control creation paths in TX/RX panel initialization.
+Expected default endpoint:
+
+- `192.168.0.2:5000`
+
+Current MCU memory split:
+
+- BOOT: `0x00000000 - 0x0001FFFF` (128KB)
+- APP: `0x00020000 - 0x0007FFFF` (384KB)
+- APP CRC32: `0x0007FFFC`
+
+Strict bootloader IAP payload checks:
+
+- `IAP_START`: exactly 12 bytes
+- `IAP_DATA`: 8-byte prefix plus chunk data
+- `IAP_FINISH`: exactly 8 bytes
+
+## Known Gaps
+
+- No automated UI test
+- No end-to-end validation against real MCU hardware in this workspace
+- No Keil build verification from this tool run
+
+## Recommended Next Validation
+
+1. Build `TCPTestTool` in Release x64.
+2. Build both MCU targets in Keil.
+3. Connect PC directly to MCU with static IPs on `192.168.0.x`.
+4. Verify `PING` and `GET_INFO`.
+5. Verify APP -> bootloader reset.
+6. Verify `.bin` burn and reboot into APP.

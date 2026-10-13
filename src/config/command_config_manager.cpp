@@ -35,11 +35,11 @@ const std::array<CommandRow, 6>& GetDefaultTemplateRows() {
 CommandConfigManager::CommandConfigManager() : ini_path_(GetIniPath()) {}
 
 std::wstring CommandConfigManager::GetIniPath() const {
-    return GetModuleDir() + L"HidTestTool_commands.ini";
+    return GetModuleDir() + L"TCPTestTool_commands.ini";
 }
 
 std::wstring CommandConfigManager::GetDefaultIniPath() const {
-    return GetModuleDir() + L"HidTestTool_commands_default.ini";
+    return GetModuleDir() + L"TCPTestTool_commands_default.ini";
 }
 
 bool CommandConfigManager::FileExists(const std::wstring& path) {

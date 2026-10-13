@@ -143,13 +143,7 @@ void CRxPanel::LayoutControls(int cx, int cy) {
     const int tx_gap = 6;
     const int tx_button_width = 90;
 
-    CString handshakeText(L"Enable Handshake (Send 1)");
-    dc.SelectObject(&m_uiFont);
-    int handshake_text_width = dc.GetTextExtent(handshakeText).cx + 26;
-    int handshake_base_width = tx_button_width * 2 + tx_gap;
-    int handshake_extra = handshake_text_width > handshake_base_width ? (handshake_text_width - handshake_base_width) : 0;
-
-    int edit_width = width - tx_check_width - tx_button_width * 2 - tx_gap * 3 - handshake_extra;
+    int edit_width = width - tx_check_width - tx_button_width * 2 - tx_gap * 3;
     if (edit_width < 120) {
         edit_width = 120;
     }
@@ -349,14 +343,19 @@ void CRxPanel::StartCapture() {
 }
 
 void CRxPanel::StopCapture() {
+    DWORD wait_result = WAIT_OBJECT_0;
+
     m_stopRequested = true;
-    if (m_device) {
-        m_device->CancelPendingIo();
-    }
     if (m_thread) {
-        WaitForSingleObject(m_thread->m_hThread, 1500);
-        delete m_thread;
-        m_thread = nullptr;
+        wait_result = WaitForSingleObject(m_thread->m_hThread, 1500);
+        if (wait_result == WAIT_TIMEOUT && m_device) {
+            m_device->CancelPendingIo();
+            wait_result = WaitForSingleObject(m_thread->m_hThread, 1500);
+        }
+        if (wait_result == WAIT_OBJECT_0) {
+            delete m_thread;
+            m_thread = nullptr;
+        }
     }
     m_rxState = RxIdle;
 }
@@ -377,7 +376,9 @@ UINT CRxPanel::ThreadLoop() {
         std::vector<unsigned char> report;
         bool ok = m_device->ReadInputReport(&report, 200, &error);
         if (!ok) {
-            if (error == L"Device removed.") {
+            if (error == L"Device removed." ||
+                error == L"TCP socket closed." ||
+                error == L"TCP receive failed.") {
                 CWnd* parent = GetParent();
                 if (parent) {
                     parent->PostMessage(MessageId(), static_cast<WPARAM>(RxDeviceRemoved), 0);
@@ -541,6 +542,27 @@ void CRxPanel::LogTxLine(const std::wstring& line) {
         return;
     }
     WriteDirectionalLogLine(L"TX", line, m_timestampEnabled.load());
+}
+
+void CRxPanel::PushExternalPayload(const std::vector<unsigned char>& payload) {
+    std::array<unsigned char, 64> bytes;
+    std::wstring hex;
+    CWnd* parent;
+
+    bytes = ExtractPayload(payload);
+    if (m_logEnabled.load()) {
+        hex = BytesToHex(bytes.data(), bytes.size());
+        WriteDirectionalLogLine(L"RX", hex, m_timestampEnabled.load());
+    }
+    UpdateLastPayload(payload);
+    EnterCriticalSection(&m_pendingLock);
+    m_pendingPayloads.push_back(bytes);
+    LeaveCriticalSection(&m_pendingLock);
+
+    parent = GetParent();
+    if (parent) {
+        parent->PostMessage(MessageId(), static_cast<WPARAM>(RxCount), 0);
+    }
 }
 
 bool CRxPanel::GetLastPayload(std::vector<unsigned char>* out_payload) {

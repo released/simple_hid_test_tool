@@ -15,12 +15,12 @@ if (-not $msbuild) {
     exit 1
 }
 
-& $msbuild "HidTestTool.sln" /p:Configuration=$Configuration /p:Platform=$Platform /m
+& $msbuild "TCPTestTool.sln" /p:Configuration=$Configuration /p:Platform=$Platform /m
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-$exe = Join-Path "build" "HidTestTool.exe"
+$exe = Join-Path "build" "TCPTestTool.exe"
 if (Test-Path $exe) {
     Write-Host "Built: $exe"
 } else {

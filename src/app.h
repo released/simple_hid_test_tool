@@ -2,7 +2,7 @@
 
 #include <afxwin.h>
 
-class CHidTestToolApp : public CWinApp {
+class CTcpTestToolApp : public CWinApp {
 public:
     BOOL InitInstance() override;
 

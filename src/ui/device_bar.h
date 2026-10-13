@@ -1,32 +1,30 @@
 #pragma once
 
 #include <afxwin.h>
-#include <afxcmn.h>
 
 #include <string>
-#include <vector>
-
-#include "../hid/hid_scan.h"
 
 class CDeviceBar : public CWnd {
 public:
     bool Create(CWnd* parent);
-    void ScanDevices();
-
-    const std::vector<HidScanInfo>& Devices() const { return m_devices; }
-    int SelectedIndex() const;
-    bool SelectByPath(const std::wstring& path);
-    bool SelectByPathHash(unsigned int path_hash);
-    bool SelectByVidPid(unsigned short vid, unsigned short pid);
 
     void SetConnected(bool connected);
     void SetConnectionState(int state);
-    void SetReportId(unsigned char report_id);
+    void SetPeerModeText(const std::wstring& text);
+    void SetUptimeText(const std::wstring& text);
+    void SetLastEventText(const std::wstring& text);
+    std::wstring GetHost() const;
+    void SetHost(const std::wstring& host);
+    unsigned short GetPort() const;
+    void SetPort(unsigned short port);
     bool IsAutoReconnectEnabled() const;
+    void SetAutoReconnectEnabled(bool enabled);
 
     static UINT MessageId() { return WM_APP + 100; }
     enum Action {
         ActionConnectToggle = 1,
+        ActionPing = 2,
+        ActionSettingsChanged = 3,
     };
     enum ConnectionState {
         StateDisconnected = 0,
@@ -39,44 +37,48 @@ protected:
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
     afx_msg void OnSize(UINT nType, int cx, int cy);
     afx_msg void OnPaint();
-    afx_msg void OnScanClicked();
     afx_msg void OnConnectClicked();
-    afx_msg void OnCopyClicked();
-    afx_msg void OnComboChanged();
-    afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-    afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
-    BOOL PreTranslateMessage(MSG* pMsg) override;
+    afx_msg void OnPingClicked();
+    afx_msg void OnAutoReconnectClicked();
+    afx_msg void OnEndpointChanged();
 
     DECLARE_MESSAGE_MAP()
 
 private:
     void LayoutControls(int cx, int cy);
-    void UpdateCombo();
-    void UpdateCapabilityText();
     void UpdateStatusText();
     void NotifyParent(Action action);
-    std::wstring BuildDeviceSummary() const;
+    std::wstring BuildVersionText() const;
+    void UpdateEndpointText();
 
-    CComboBox m_deviceCombo;
-    CButton m_scanButton;
+    CStatic m_hostLabel;
+    CEdit m_hostEdit;
+    CStatic m_portLabel;
+    CEdit m_portEdit;
     CButton m_connectButton;
+    CButton m_pingButton;
     CButton m_autoReconnectCheck;
-    CStatic m_capTitle;
-    CStatic m_capVidPid;
-    CStatic m_capUsage;
-    CStatic m_capReports;
+    CStatic m_summaryTitleLabel;
+    CStatic m_summaryTitleValue;
+    CStatic m_summaryModeLabel;
+    CStatic m_summaryModeValue;
+    CStatic m_summaryUptimeLabel;
+    CStatic m_summaryUptimeValue;
+    CStatic m_summaryProtocolLabel;
+    CStatic m_summaryProtocolValue;
+    CStatic m_summaryPayloadLabel;
+    CStatic m_summaryPayloadValue;
+    CStatic m_summaryEventLabel;
+    CStatic m_summaryEventValue;
     CStatic m_statusLabel;
-    CButton m_copyButton;
-    std::wstring m_statusText;
-    std::vector<HidScanInfo> m_devices;
-    bool m_connected;
-    int m_connectionState;
-    unsigned char m_reportId;
+    CStatic m_buildVersionLabel;
+    CStatic m_buildStampLabel;
+    bool m_connected = false;
+    int m_connectionState = StateDisconnected;
+    std::wstring m_peerMode = L"Unknown";
+    std::wstring m_uptime = L"Unknown";
+    std::wstring m_lastEvent = L"Idle";
     CFont m_uiFont;
-    CImageList m_iconScan;
-    CImageList m_iconConnect;
-    CImageList m_iconCopy;
-    CToolTipCtrl m_tooltip;
-    CBrush m_vidPidHighlightBrush;
+    CBrush m_highlightBrush;
 };
 

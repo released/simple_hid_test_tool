@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HidTestTool", "HidTestTool.vcxproj", "{7D969FED-2C32-43D2-8A6F-E1587C48C687}"
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "TCPTestTool", "TCPTestTool.vcxproj", "{7D969FED-2C32-43D2-8A6F-E1587C48C687}"
 EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution

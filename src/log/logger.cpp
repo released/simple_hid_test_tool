@@ -71,7 +71,7 @@ std::wstring RxLogger::BuildFileName() const {
     GetLocalTime(&now);
 
     wchar_t name[64] = {};
-    swprintf_s(name, L"%04u%02u%02u_%02u%02u%02u_hid_rx.log",
+    swprintf_s(name, L"%04u%02u%02u_%02u%02u%02u_tcp_rx.log",
                now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond);
 
     return GetModuleDirectory() + name;

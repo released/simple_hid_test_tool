@@ -30,16 +30,10 @@
     <ClCompile Include="src\config\config_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\handshake_fsm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\hid\hid_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\hid\hid_scan.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\hid\hid_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\log\logger.cpp">
@@ -51,7 +45,16 @@
     <ClCompile Include="src\core\scheduler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\tcp\tcp_protocol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\ui\device_bar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\firmware_panel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\function_panel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ui\tx_panel.cpp">
@@ -65,6 +68,9 @@
     <ClInclude Include="src\app.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\build_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\core\command_parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -74,16 +80,10 @@
     <ClInclude Include="src\config\config_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\handshake_fsm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\hid\hid_device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\hid\hid_scan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\hid\hid_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\log\logger.h">
@@ -95,7 +95,16 @@
     <ClInclude Include="src\core\scheduler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\tcp\tcp_protocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\ui\device_bar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\firmware_panel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\function_panel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\tx_panel.h">
@@ -109,12 +118,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="src\HidTestTool.rc">
+    <ResourceCompile Include="src\TCPTestTool.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\res\hid.ico">
+    <None Include="src\res\tcp.ico">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

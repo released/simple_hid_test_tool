@@ -1,4 +1,4 @@
 #include "app.h"
 
-CHidTestToolApp theApp;
+CTcpTestToolApp theApp;
 

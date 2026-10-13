@@ -1,202 +1,389 @@
-﻿# HidTestTool
+# TCPTestTool
 
-Windows MFC HID 測試工具（64-byte payload），用於送命令、收回應、驗證 Echo / Handshake 流程。
+Windows MFC TCP client for the M480 lwIP TCP bootloader/application project.
 
+This project was cloned from `HidTestTool` and keeps the same general UI flow:
 
-![image](https://github.com/released/HidTestTool/blob/main/main_window.jpg) 
+- Top connection bar
+- Console tab for 64-byte command TX/RX
+- Function tab for ADC / GPIO / PWM control
+- Firmware tab for bootloader entry, binary load, burn, progress, and MCU reset
+
+The transport layer is no longer HID. It now uses a TCP socket to talk to the MCU TCP server.
+
+## Workspace
+
+- PC tool: this repository.
+- MCU project: M480 TCP IAP firmware repository.
+- MCU project README: README in the MCU firmware repository.
+
+## Features
+
+- Connect to MCU by IP and port
+- Ping MCU
+- Read peer information
+- Poll APP uptime once per second after APP mode is detected
+- Send 64-byte raw command frames from the Console tab
+- Receive and display RX data
+- Optional RX logging to `YYYYMMDD_HHMMSS_tcp_rx.log`
+- Function tab sub-pages for ADC / GPIO / PWM RAW64 packets
+- Load firmware `.bin`
+- Request APP to reset into bootloader
+- Transfer firmware to bootloader over TCP
+- Show burn progress
+- Show firmware failure detail fields: offset, status, transport error, chunk size, image size
+- Reset MCU after update
+
+## Default Network
+
+- MCU IP: `192.168.0.2`
+- TCP port: `5000`
+- Suggested PC IP: `192.168.0.10`
+- Netmask: `255.255.255.0`
 
 ## Build
 
-```bat
-scripts\build_release.bat
+Requirements:
+
+- Visual Studio with MFC and MSBuild
+- Windows x64 or Win32 build environment
+
+Build command:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build.ps1 -Configuration Release -Platform x64
 ```
 
-輸出：
-- `build\HidTestTool.exe`
-- `build\obj\x64\Release\HidTestTool.pdb`
+Output:
 
-`build_release.bat` 行為：
-- build 前會先關閉正在執行的 `HidTestTool.exe`
-- build 成功後會自動重新開啟 `build\HidTestTool.exe`
+- `build\TCPTestTool.exe`
+- `build\obj\<Platform>\<Configuration>\TCPTestTool.pdb`
 
-## Clean（保留 exe）
+Build metadata:
+
+- The connection summary area shows build date/time and build version/number.
+- `scripts\update_build_info.ps1` runs before each build.
+- The pre-build script bumps RC `FILEVERSION` / `PRODUCTVERSION`.
+- The same pre-build script regenerates `src\build_info.h` for the UI build label.
+
+Clean compiler intermediates while preserving the executable, INI/profile files, logs, and other runtime files:
 
 ```bat
 scripts\clean_build.bat
 ```
 
-行為：
-- 清理 `build\` 內所有內容
-- 只保留 `build\HidTestTool.exe`
+## Runtime Files
 
-## 啟動與介面
+- `TCPTestTool.ini`
+  - host
+  - port
+  - auto reconnect
+  - scheduler settings
+  - RX logging settings
+  - last firmware path
+- `TCPTestTool_commands.ini`
+  - runtime TX row definitions
+- `TCPTestTool_commands_default.ini`
+  - default TX row template
 
-畫面由上到下：
-1. DeviceBar
-2. TX Panel（Command Send）
-3. RX Panel（Monitor）
-4. Status Bar
+## UI Summary
 
-啟動時：
-- 先顯示輕量 splash：`Initializing HID Test Tool...`
-- 主視窗內不使用 overlay
-- 初始掃描由 timer 延後觸發
+### Connection Bar
 
-## 快速使用
+- Host
+- Port
+- Connect / Disconnect
+- Ping
+- Auto reconnect
+- Connection summary
 
-1. 按 `Scan Device`。
-2. 在 Device Capability 確認目標 HID：
-   - `UsagePage/Usage = 0xFF00 / 0x0001`
-   - `IN=64 OUT=64`
-3. 按 `Connect`。
-4. 在 TX row 填入命令，勾選要送的列。
-5. 用 `Single-shot`（單次）或 `Start TX`（連續）。
-6. 在 RX panel 觀察回應。
+### Console Tab
 
-## DeviceBar 重點
+- TX rows based on the original tool flow
+- Interval send and limit settings only
+- RX view and optional log file
+- No USB HID report / echo / handshake options remain in the active UI
 
-- Device 清單格式：`VID:PID  IN:xx OUT:xx  [Manufacturer - Product]`
-- `VID:PID` capability 列有高對比底色，便於快速辨識
-- 多 HID 裝置時，請先核對 `UsagePage/Usage` 再連線，避免連錯介面
+Raw TX rows are packed into the TCP protocol as command `RAW64`.
 
-## TX Panel 重點
+### Function Tab
 
-- 每列：`Send N` + 64-byte hex + `Default` + `Send Once`
-- `Default`：該列重設為 `FF * 64`
-- `Set interval` 未勾選時固定 `100 ms`
-- `Save As` / `Load`：匯出/匯入 command ini
-- `Echo Mode` 與 `Handshake Mode` 互斥
+- ADC / GPIO / PWM are split into sub-tabs.
+- Each sub-tab has its own polling checkbox.
+- Polling is active only when connected to APP mode.
+- Refresh sends one immediate read request for the current function sub-tab.
+- Show ADC display 1 / display 2 / VREF in mV, plus band-gap raw
+- Show GPIO input state
+- Control GPIO output
+- Control PWM frequency and duty
+- Polling updates telemetry without overwriting pending GPIO output or PWM edit values.
+- Show last TX / RX `RAW64` packet used by ADC / GPIO / PWM actions
+- Function button actions are dispatched through the background control-poll worker, so button clicks do not block the UI thread.
 
-Echo Mode 自動命令：
-- Enable：`5A 5A EE 01` + 後續補 `00`
-- Disable：`5A 5A EE 00` + 後續補 `00`
+### Firmware Tab
 
-Handshake Mode：
-- `Send 1` 視為 handshake key command
-- 啟用時 `Send 1` 相關欄位會鎖定（灰化）
-- 每個 TX cycle 先送 key，收到完全相同 echo 後才送 Row2~Row6
+- Firmware path edit
+- Browse
+- Burn Firmware
+- Enter Bootloader
+- Reset MCU
+- Progress bar
+- Peer mode display
 
-## RX Panel 與 Log
+## Protocol Spec
 
-- 顯示最近 10 筆 RX（最舊在上、最新在下）
-- `Save to log` / `Add timestamp` 永遠可用
-- `Clear Data` 只在 disconnected 時可用
+The tool uses a framed TCP protocol defined in:
 
-Log：
-- 檔名：`YYYYMMDD_HHMMSS_hid_rx.log`
-- 路徑：與 `HidTestTool.exe` 同層
-- 內容含 TX + RX，格式：
-  - 無時間戳：`[TX] [<hex>]` / `[RX] [<hex>]`
-  - 有時間戳：`[HH:MM:SS.mmm] [TX] [<hex>]` / `[HH:MM:SS.mmm] [RX] [<hex>]`
+- PC: `src\tcp\tcp_protocol.h`
+- MCU: `SampleCode\Template\tcp_tool_protocol.h`
 
-## 設定檔
+### Frame Header
 
-- `HidTestTool.ini`：主設定
-- `HidTestTool_commands.ini`：目前 TX row 內容
-- `HidTestTool_commands_default.ini`：預設模板
+Each TCP frame starts with a fixed 20-byte header:
 
-首次啟動：
-- 若缺 `HidTestTool_commands.ini`，會以 UI 預設（`FF * 64`）建立
-- 若缺 `HidTestTool_commands_default.ini`，會建立預設模板檔
+| Byte | Field | Note |
+| --- | --- | --- |
+| `0..3` | `magic` | ASCII `TCP1` |
+| `4` | `command` | command ID |
+| `5` | `status` | response status, request uses `0` |
+| `6..7` | `reserved` | reserved, send `0` |
+| `8..11` | `sequence` | request/response sequence number |
+| `12..15` | `payload_length` | payload size in bytes |
+| `16..19` | `payload_crc32` | CRC32 of payload only |
 
----
+All multi-byte fields use little-endian format.
+Protocol version is reported by `GET_INFO`, not stored as a separate frame-header byte.
 
-# HidTestTool (English)
+### Common Status Codes
 
-Windows MFC HID test tool (64-byte payload) for command TX/RX, Echo mode, and Handshake flow validation.
+- `0x00` `OK`
+- `0x01` `ERROR`
+- `0x02` `INVALID_STATE`
+- `0x03` `INVALID_PARAM`
+- `0x04` `VERIFY_FAILED`
+- `0x05` `BUSY`
 
-## Build
+### Peer Modes
 
-```bat
-scripts\build_release.bat
+- `0x00` `UNKNOWN`
+- `0x01` `APP`
+- `0x02` `BOOT`
+
+### Command Table
+
+- `0x01` `PING`
+  - Request payload: none
+  - Response payload: ASCII `PONG`
+- `0x02` `GET_INFO`
+  - Request payload: none
+  - Response payload:
+
+```c
+typedef struct tcp_tool_get_info_payload
+{
+    uint8_t peer_mode;
+    uint8_t protocol_version;
+    uint16_t reserved;
+    uint32_t app_start_addr;
+    uint32_t app_size;
+    uint32_t max_chunk_size;
+    uint32_t uptime_seconds;
+} tcp_tool_get_info_payload_t;
 ```
 
-Outputs:
-- `build\HidTestTool.exe`
-- `build\obj\x64\Release\HidTestTool.pdb`
+  - Wire size: `20 bytes`
+- `0x03` `GET_UPTIME`
+  - Request payload: none
 
-`build_release.bat` behavior:
-- Stops running `HidTestTool.exe` before build
-- Relaunches `build\HidTestTool.exe` after successful build
-
-## Clean (Keep EXE Only)
-
-```bat
-scripts\clean_build.bat
+```c
+typedef struct tcp_tool_uptime_payload
+{
+    uint32_t uptime_seconds;
+} tcp_tool_uptime_payload_t;
 ```
 
-Behavior:
-- Cleans everything under `build\`
-- Keeps only `build\HidTestTool.exe`
+  - Wire size: `4 bytes`
+- `0x10` `RAW64`
+  - Request payload: fixed 64 bytes
+  - APP response: echo 64 bytes, or function packet response for known APP packets
+  - BOOT response: echo 64 bytes
+- `0x20` `RESET_TO_BOOT`
+  - Request payload: none
+  - APP response: schedules checksum invalidation path and reset to bootloader
+  - BOOT response: `OK` no-op
+- `0x30` `IAP_START`
+  - Request payload:
+    - `u32 image_size`
+    - `u32 image_crc32`
+    - `u32 requested_chunk_size`
+  - BOOT response payload:
+    - `u32 accepted_chunk_size`
+- `0x31` `IAP_DATA`
+  - Request payload:
+    - `u32 offset`
+    - `u32 chunk_length`
+    - `u8 data[chunk_length]`
+  - BOOT response payload:
+    - `u32 accepted_offset`
+    - `u32 total_received`
+- `0x32` `IAP_FINISH`
+  - Request payload:
+    - `u32 image_size`
+    - `u32 image_crc32`
+  - BOOT response payload: none
+- `0x33` `RESET_MCU`
+  - Request payload: none
+  - Response payload: none
 
-## Startup and Layout
+### APP Behavior
 
-Window order (top to bottom):
-1. DeviceBar
-2. TX Panel (Command Send)
-3. RX Panel (Monitor)
-4. Status Bar
+The APP TCP server accepts:
 
-On startup:
-- Shows lightweight splash: `Initializing HID Test Tool...`
-- No main-window overlay
-- Initial device scan is deferred by timer
+- `PING`
+- `GET_INFO`
+- `GET_UPTIME`
+- `RAW64`
+- `RESET_TO_BOOT`
+- `RESET_MCU`
 
-## Quick Start
+The APP TCP server rejects:
 
-1. Click `Scan Device`.
-2. In Device Capability, confirm target HID:
-   - `UsagePage/Usage = 0xFF00 / 0x0001`
-   - `IN=64 OUT=64`
-3. Click `Connect`.
-4. Edit TX row bytes and enable rows to send.
-5. Use `Single-shot` (one cycle) or `Start TX` (continuous).
-6. Observe responses in RX panel.
+- `IAP_START`
+- `IAP_DATA`
+- `IAP_FINISH`
 
-## DeviceBar Notes
+### RAW64 Function Packets
 
-- Device list format: `VID:PID  IN:xx OUT:xx  [Manufacturer - Product]`
-- `VID:PID` capability row has contrast highlight for quick identification.
-- If multiple HID devices exist, verify `UsagePage/Usage` before connect.
-- `Reports` row includes `IN/OUT/FEAT` and current `ReportID=0xNN`.
-- Separate Report hint row is removed.
+APP mode uses `RAW64` sub-packets for ADC / GPIO / PWM control.
+These packets are now split by feature domain instead of keeping every function inside one shared telemetry layout.
 
-## TX Panel Notes
+- `0xA0` `ADC`
+  - Request:
+    - `Byte[0] = 0xA0`
+    - `Byte[1] = 0x5A` for READ
+    - `Byte[2..63] = 0`
+  - Response:
+    - `Byte[0] = packet_id`
+    - `Byte[1] = 0x5A` for READ
+    - `Byte[2..3] = adc_bandgap_raw`
+    - `Byte[4..5] = adc_display_1_raw`
+    - `Byte[6..7] = adc_display_2_raw`
+    - `Byte[8..63] = reserved`
+  - Voltage conversion is done in the PC tool from `adc_bandgap_raw` and the ADC raw values.
+- `0xA1` `GPIO`
+  - Read request:
+    - `Byte[0] = 0xA1`
+    - `Byte[1] = 0x5A` for READ
+    - `Byte[2..63] = 0`
+  - Read response:
+    - `Byte[0] = packet_id`
+    - `Byte[1] = 0x5A` for READ
+    - `Byte[2] = gpio_input_status_1`
+    - `Byte[3] = gpio_input_status_2`
+    - `Byte[4..63] = reserved`
+  - Current APP mapping:
+    - `Byte[2]` = GPIO input demo status 1
+    - `Byte[3]` = reserved for GPIO input demo status 2
+  - Write request:
+    - `Byte[0] = 0xA1`
+    - `Byte[1] = 0xA5` for WRITE
+    - `Byte[2] = gpio_output_write_1`
+    - `Byte[3] = gpio_output_write_2`
+    - `Byte[4..63] = reserved`
+  - Current APP mapping:
+    - `Byte[2]` controls the current GPIO output demo slot
+    - `Byte[3]` is reserved
+  - Write response:
+    - `Byte[0] = packet_id`
+    - `Byte[1] = 0xA5` for WRITE
+    - `Byte[2] = gpio_output_status_1`
+    - `Byte[3] = gpio_output_status_2`
+    - `Byte[4..63] = reserved`
+  - Current APP mapping:
+    - `Byte[2]` = GPIO output demo status 1
+    - `Byte[3]` = reserved for GPIO output demo status 2
+- `0xA2` `PWM`
+  - Read request:
+    - `Byte[0] = 0xA2`
+    - `Byte[1] = 0x5A` for READ
+    - `Byte[2..63] = 0`
+  - Read response:
+    - `Byte[0] = packet_id`
+    - `Byte[1] = 0x5A` for READ
+    - `Byte[2..4] = pwm_freq_1_hz_le24`
+    - `Byte[5] = pwm_duty_1_percent`
+    - `Byte[6..8] = pwm_freq_2_hz_le24`
+    - `Byte[9] = pwm_duty_2_percent`
+    - `Byte[10..63] = reserved`
+  - Write request:
+    - `Byte[0] = 0xA2`
+    - `Byte[1] = 0xA5` for WRITE
+    - `Byte[2..4] = pwm_freq_1_hz_le24`
+    - `Byte[5] = pwm_duty_1_percent`
+    - `Byte[6..8] = pwm_freq_2_hz_le24`
+    - `Byte[9] = pwm_duty_2_percent`
+    - `Byte[10..63] = reserved`
+  - Current APP mapping:
+    - slot 1 is the active PWM output
+    - slot 2 is reserved
 
-- Per row: `Send N` + 64-byte hex + `Default` + `Send Once`
-- `Default` resets the row to `FF * 64`
-- If `Set interval` is unchecked, scheduler uses fixed `100 ms`
-- `Save As` / `Load` for command ini export/import
-- `Echo Mode` and `Handshake Mode` are mutually exclusive
+`Function` tab in `TCPTestTool` uses these packets and keeps `Firmware` as the last tab.
 
-Echo mode auto commands:
-- Enable: `5A 5A EE 01` + remaining `00`
-- Disable: `5A 5A EE 00` + remaining `00`
+### BOOT Behavior
 
-Handshake mode:
-- `Send 1` is treated as handshake key command
-- `Send 1` controls are locked (greyed out) while handshake mode is on
-- Each TX cycle sends key first; only exact echo match allows Row2~Row6
+The bootloader TCP server accepts:
 
-## RX Panel and Log
+- `PING`
+- `GET_INFO`
+- `RAW64`
+- `RESET_TO_BOOT`
+- `IAP_START`
+- `IAP_DATA`
+- `IAP_FINISH`
+- `RESET_MCU`
 
-- Shows last 10 RX packets (oldest top, newest bottom)
-- `Save to log` / `Add timestamp` always enabled
-- `Clear Data` enabled only when disconnected
+The bootloader returns `INVALID_STATE` for `GET_UPTIME`; uptime polling is APP-only.
 
-Log:
-- Filename: `YYYYMMDD_HHMMSS_hid_rx.log`
-- Location: same folder as `HidTestTool.exe`
-- Includes both TX and RX lines:
-  - No timestamp: `[TX] [<hex>]` / `[RX] [<hex>]`
-  - With timestamp: `[HH:MM:SS.mmm] [TX] [<hex>]` / `[HH:MM:SS.mmm] [RX] [<hex>]`
+### Firmware Transfer Rules
 
-## Config Files
+1. The PC should call `GET_INFO` after connect.
+2. If the peer mode is `APP`, the PC should issue `RESET_TO_BOOT` and reconnect.
+3. `IAP_START` erases the APP region and returns the accepted chunk size.
+4. `IAP_DATA` must be sent sequentially with matching `offset`.
+5. `IAP_FINISH` verifies final size and CRC, then checks APP validity.
+6. After success, the PC may send `RESET_MCU` to boot the new APP.
 
-- `HidTestTool.ini`: main settings
-- `HidTestTool_commands.ini`: runtime TX rows
-- `HidTestTool_commands_default.ini`: default template
+Fixed-format IAP payloads are strict:
 
-First launch behavior:
-- If `HidTestTool_commands.ini` is missing, it is created from UI defaults (`FF * 64`)
-- If `HidTestTool_commands_default.ini` is missing, default template file is created
+- `IAP_START` request payload must be exactly 12 bytes.
+- `IAP_FINISH` request payload must be exactly 8 bytes.
+- `IAP_DATA` uses an 8-byte fixed prefix plus variable-length chunk data.
+
+### Packet Design Guidance
+
+- Keep the framed TCP header fixed.
+- Prefer one sub-packet for one feature domain instead of one ever-growing mega packet.
+- Current APP examples already follow this pattern:
+  - `0xA0` ADC
+  - `0xA1` GPIO
+  - `0xA2` PWM
+- This scales better than forcing ADC / GPIO / PWM / future custom features into one packet forever.
+- If future UI needs periodic updates, add per-feature polling controls or checkboxes on the PC side and keep each feature packet independent.
+
+## Firmware Update Flow
+
+1. Connect to APP or bootloader.
+2. Run `GET_INFO`.
+3. If peer mode is APP, request `RESET_TO_BOOT`.
+4. Reconnect to bootloader.
+5. Load `.bin`.
+6. Send `IAP_START`.
+7. Send `IAP_DATA` chunks.
+8. Send `IAP_FINISH`.
+9. Optionally click `Reset MCU`.
+
+## Notes
+
+- Several source filenames still keep historical `hid_*` names to avoid larger project churn.
+- The actual runtime transport is TCP, not HID.
+- The MCU side must expose the matching framed TCP protocol on port `5000`.

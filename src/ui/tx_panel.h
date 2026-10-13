@@ -41,22 +41,12 @@ public:
 
     void SetSchedulerEnabled(bool enabled);
     void SetRunning(bool running);
-    bool GetReportId(unsigned char* out_value, std::wstring* error) const;
-    void SetReportId(unsigned char value);
     bool IsHexPrefixMode() const;
     void SetHexPrefixMode(bool enabled);
     DWORD GetIntervalValue() const;
     bool IsIntervalEnabled() const;
     void SetIntervalValue(DWORD value);
     void SetIntervalEnabled(bool enabled);
-    bool IsHandshakeEnabled() const;
-    void SetHandshakeEnabled(bool enabled);
-    int GetHandshakeRetryCount() const;
-    void SetHandshakeRetryCount(int count);
-    bool IsEchoModeEnabled() const;
-    bool IsHandshakeModeEnabled() const;
-    void SetEchoModeEnabled(bool enabled);
-    void SetHandshakeModeEnabled(bool enabled);
     bool IsLimitEnabled() const;
     int GetLimitCount() const;
     void SetLimitEnabled(bool enabled);
@@ -66,8 +56,6 @@ public:
     void FocusNextByte(int row, int col, bool forward);
     bool GetByteValue(int row, int col, unsigned char* out_value) const;
     bool PasteBytes(int row, int col, const std::wstring& text);
-    void SetHandshakeState(int state);
-    void SetLastEchoBytes(const std::vector<unsigned char>& bytes);
     void GetGridMetrics(int* out_start_x, int* out_cell_base, int* out_cell_extra,
                         int* out_row_height, int* out_row_gap) const;
     int GetPreferredHeight() const;
@@ -84,12 +72,6 @@ public:
         ActionSaveAs = 8,
         ActionReload = 9,
     };
-    enum HandshakeState {
-        HsOff = 0,
-        HsWaiting = 1,
-        HsOk = 2,
-        HsError = 3,
-    };
 
 protected:
     afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -99,15 +81,7 @@ protected:
     afx_msg void OnSingleShotClicked();
     afx_msg void OnIntervalChanged();
     afx_msg void OnIntervalCheck();
-    afx_msg void OnReportChanged();
     afx_msg void OnSelectAllClicked();
-    afx_msg void OnHandshakeChanged();
-    afx_msg void OnRetryChanged();
-    afx_msg void OnRetryKillFocus();
-    afx_msg void OnEchoModeChanged();
-    afx_msg void OnHandshakeModeChanged();
-    afx_msg void OnEchoHelpClicked();
-    afx_msg void OnHandshakeHelpClicked();
     afx_msg void OnLimitChanged();
     afx_msg void OnLimitCheck();
     afx_msg void OnLimitKillFocus();
@@ -147,30 +121,17 @@ private:
     CButton m_singleShotButton;
     CComboBox m_intervalCombo;
     CButton m_intervalCheck;
-    CStatic m_reportLabel;
-    CEdit m_reportEdit;
-    CStatic m_retryLabel;
-    CEdit m_retryEdit;
-    CSpinButtonCtrl m_retrySpin;
-    CButton m_echoModeCheck;
-    CButton m_handshakeModeCheck;
-    CButton m_echoHelpButton;
-    CButton m_handshakeHelpButton;
     CButton m_limitCheck;
     CEdit m_limitEdit;
     CSpinButtonCtrl m_limitSpin;
     CStatic m_limitStatus;
     CButton m_selectAllCheck;
-    CButton m_handshakeCheck;
     CButton m_saveAsButton;
     CButton m_reloadButton;
     bool m_hexPrefix;
     bool m_running;
     bool m_connected = false;
     bool m_syncingSelectAll = false;
-    CStatic m_echoLabel;
-    std::array<CEdit, 64> m_echoBytes;
-    int m_handshakeState = HsOff;
     int m_limitSent = 0;
     int m_limitRemaining = 0;
     int m_hoverRow = -1;

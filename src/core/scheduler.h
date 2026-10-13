@@ -7,7 +7,7 @@
 
 #include <afxwin.h>
 
-#include "handshake_fsm.h"
+#include "../hid/hid_device.h"
 struct TxCommandRow {
     bool enabled = false;
     std::vector<unsigned char> payload;
@@ -19,17 +19,12 @@ public:
     ~TxScheduler();
 
     void SetDevice(HidDevice* device);
-    void SetHandshake(HandshakeFsm* fsm);
 
     void SetNotifyHwnd(HWND hwnd);
 
     struct Settings {
         bool interval_enabled = false;
         DWORD interval_ms = 100;
-        unsigned char report_id = 0;
-        bool handshake_enabled = false;
-        DWORD handshake_timeout_ms = 300;
-        int handshake_retry_count = 5;
         bool limit_enabled = false;
         int limit_count = 0;
         std::array<TxCommandRow, 6> rows;
@@ -48,11 +43,10 @@ public:
     enum EventType {
         EventError = 1,
         EventTxCount = 2,
-        EventHandshake = 3,
-        EventDeviceRemoved = 4,
-        EventWriteInfo = 5,
-        EventLimitUpdate = 6,
-        EventTxLog = 7,
+        EventDeviceRemoved = 3,
+        EventWriteInfo = 4,
+        EventLimitUpdate = 5,
+        EventTxLog = 6,
     };
 
     struct EventPayload {
@@ -67,11 +61,10 @@ private:
 
     void RunCycle();
     DWORD CurrentIntervalMs(const Settings& settings) const;
-    bool BuildReport(unsigned char report_id, const std::vector<unsigned char>& payload, std::vector<unsigned char>* report, std::wstring* error);
+    bool BuildReport(const std::vector<unsigned char>& payload, std::vector<unsigned char>* report, std::wstring* error);
     void Notify(EventType type, unsigned long long value, const std::wstring& text);
 
     HidDevice* device_;
-    HandshakeFsm* handshake_;
 
     std::atomic<bool> running_;
     std::atomic<bool> stop_requested_;

@@ -14,24 +14,16 @@ const int kStartId = 4001;
 const int kSingleShotId = 4002;
 const int kIntervalComboId = 4003;
 const int kIntervalCheckId = 4004;
-const int kReportEditId = 4005;
-const int kRetryEditId = 4006;
 const int kLimitCheckId = 4007;
 const int kLimitEditId = 4008;
-const int kHandshakeId = 4009;
 const int kSelectAllId = 4010;
 const int kSaveAsId = 4011;
 const int kReloadId = 4012;
-const int kEchoModeId = 4013;
-const int kHandshakeModeId = 4014;
-const int kEchoHelpId = 4015;
-const int kHandshakeHelpId = 4016;
 
 const int kSendCheckBase = 4100;
 const int kRestoreBase = 4300;
 const int kSendOnceBase = 4400;
 const int kByteEditBase = 5000;
-const int kEchoByteBase = 5500;
 
 const int kRowCount = 6;
 const int kByteCount = 64;
@@ -201,20 +193,12 @@ BEGIN_MESSAGE_MAP(CTxPanel, CWnd)
     ON_BN_CLICKED(kSingleShotId, &CTxPanel::OnSingleShotClicked)
     ON_CBN_SELCHANGE(kIntervalComboId, &CTxPanel::OnIntervalChanged)
     ON_BN_CLICKED(kIntervalCheckId, &CTxPanel::OnIntervalCheck)
-    ON_EN_CHANGE(kReportEditId, &CTxPanel::OnReportChanged)
-    ON_EN_CHANGE(kRetryEditId, &CTxPanel::OnRetryChanged)
-    ON_EN_KILLFOCUS(kRetryEditId, &CTxPanel::OnRetryKillFocus)
-    ON_BN_CLICKED(kEchoModeId, &CTxPanel::OnEchoModeChanged)
-    ON_BN_CLICKED(kHandshakeModeId, &CTxPanel::OnHandshakeModeChanged)
-    ON_BN_CLICKED(kEchoHelpId, &CTxPanel::OnEchoHelpClicked)
-    ON_BN_CLICKED(kHandshakeHelpId, &CTxPanel::OnHandshakeHelpClicked)
     ON_BN_CLICKED(kLimitCheckId, &CTxPanel::OnLimitCheck)
     ON_EN_CHANGE(kLimitEditId, &CTxPanel::OnLimitChanged)
     ON_EN_KILLFOCUS(kLimitEditId, &CTxPanel::OnLimitKillFocus)
     ON_BN_CLICKED(kSaveAsId, &CTxPanel::OnSaveAsClicked)
     ON_BN_CLICKED(kReloadId, &CTxPanel::OnReloadClicked)
     ON_BN_CLICKED(kSelectAllId, &CTxPanel::OnSelectAllClicked)
-    ON_BN_CLICKED(kHandshakeId, &CTxPanel::OnHandshakeChanged)
     ON_COMMAND_RANGE(kSendCheckBase, kSendCheckBase + kRowCount - 1, &CTxPanel::OnRowCheckChanged)
     ON_COMMAND_RANGE(kRestoreBase, kRestoreBase + kRowCount - 1, &CTxPanel::OnRestoreClicked)
     ON_COMMAND_RANGE(kSendOnceBase, kSendOnceBase + kRowCount - 1, &CTxPanel::OnSendOnceClicked)
@@ -284,38 +268,6 @@ int CTxPanel::OnCreate(LPCREATESTRUCT lpCreateStruct) {
                            CRect(0, 0, 0, 0), this, kIntervalCheckId);
     m_intervalCheck.SetFont(&m_uiFont);
 
-    m_reportLabel.Create(L"ReportID", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
-    m_reportLabel.SetFont(&m_uiFont);
-    m_reportEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
-                        CRect(0, 0, 0, 0), this, kReportEditId);
-    m_reportEdit.SetFont(&m_monoFont);
-    m_reportEdit.SetWindowTextW(L"0x00");
-
-    m_retryLabel.Create(L"Retry", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
-    m_retryLabel.SetFont(&m_uiFont);
-    m_retryEdit.Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER,
-                       CRect(0, 0, 0, 0), this, kRetryEditId);
-    m_retryEdit.SetFont(&m_monoFont);
-    m_retryEdit.SetWindowTextW(L"5");
-    m_retrySpin.Create(WS_CHILD | WS_VISIBLE | UDS_ALIGNRIGHT | UDS_SETBUDDYINT | UDS_ARROWKEYS,
-                       CRect(0, 0, 0, 0), this, 0);
-    m_retrySpin.SetBuddy(&m_retryEdit);
-    m_retrySpin.SetRange32(5, 99);
-    m_retrySpin.SetPos32(5);
-
-    m_echoModeCheck.Create(L"Echo Mode", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                           CRect(0, 0, 0, 0), this, kEchoModeId);
-    m_echoModeCheck.SetFont(&m_uiFont);
-    m_handshakeModeCheck.Create(L"Handshake Mode", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
-                                CRect(0, 0, 0, 0), this, kHandshakeModeId);
-    m_handshakeModeCheck.SetFont(&m_uiFont);
-    m_echoHelpButton.Create(L"?", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-                            CRect(0, 0, 0, 0), this, kEchoHelpId);
-    m_echoHelpButton.SetFont(&m_uiFont);
-    m_handshakeHelpButton.Create(L"?", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-                                 CRect(0, 0, 0, 0), this, kHandshakeHelpId);
-    m_handshakeHelpButton.SetFont(&m_uiFont);
-
     m_saveAsButton.Create(L"Save As", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
                           CRect(0, 0, 0, 0), this, kSaveAsId);
     m_saveAsButton.SetFont(&m_uiFont);
@@ -338,23 +290,9 @@ int CTxPanel::OnCreate(LPCREATESTRUCT lpCreateStruct) {
     m_limitStatus.Create(L"Sent: 0  Left: 0", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
     m_limitStatus.SetFont(&m_uiFont);
 
-    m_echoLabel.Create(L"Last Echo", WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this);
-    m_echoLabel.SetFont(&m_uiFont);
-    for (int i = 0; i < kByteCount; ++i) {
-        int id = kEchoByteBase + i;
-        m_echoBytes[i].Create(WS_CHILD | WS_VISIBLE | WS_BORDER | ES_CENTER | ES_READONLY | WS_DISABLED,
-                              CRect(0, 0, 0, 0), this, id);
-        m_echoBytes[i].SetFont(&m_monoFont);
-        m_echoBytes[i].SetWindowTextW(L"");
-    }
-
     m_selectAllCheck.Create(L"Sel. all", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
                             CRect(0, 0, 0, 0), this, kSelectAllId);
     m_selectAllCheck.SetFont(&m_uiFont);
-
-    m_handshakeCheck.Create(L"Enable Handshake (Send 1)", WS_CHILD | BS_AUTOCHECKBOX,
-                            CRect(0, 0, 0, 0), this, kHandshakeId);
-    m_handshakeCheck.SetFont(&m_uiFont);
 
     for (int i = 0; i < kRowCount; ++i) {
         CString label;
@@ -390,18 +328,11 @@ int CTxPanel::OnCreate(LPCREATESTRUCT lpCreateStruct) {
     m_tooltip.AddTool(&m_singleShotButton, L"Send one TX cycle");
     m_tooltip.AddTool(&m_intervalCombo, L"Interval in milliseconds");
     m_tooltip.AddTool(&m_intervalCheck, L"Use selected interval (unchecked = 100 ms)");
-    m_tooltip.AddTool(&m_reportEdit, L"Report ID (0x00 - 0xFF)");
-    m_tooltip.AddTool(&m_retryEdit, L"Handshake retry count (min 5)");
-    m_tooltip.AddTool(&m_echoModeCheck, L"Echo-only mode (disable hand-shaking)");
-    m_tooltip.AddTool(&m_handshakeModeCheck, L"Handshake mode");
-    m_tooltip.AddTool(&m_echoHelpButton, L"Echo mode example");
-    m_tooltip.AddTool(&m_handshakeHelpButton, L"Handshake mode example");
     m_tooltip.AddTool(&m_limitCheck, L"Limit TX cycles");
     m_tooltip.AddTool(&m_limitEdit, L"TX cycle count");
     m_tooltip.AddTool(&m_saveAsButton, L"Save TX commands to file");
     m_tooltip.AddTool(&m_reloadButton, L"Load TX commands from selected INI file");
     m_tooltip.AddTool(&m_selectAllCheck, L"Select or clear all TX rows");
-    m_tooltip.AddTool(&m_echoLabel, L"Last RX payload (64 bytes)");
     for (int i = 0; i < kRowCount; ++i) {
         CString tip;
         tip.Format(L"Enable row %d in scheduler", i + 1);
@@ -428,12 +359,7 @@ void CTxPanel::LayoutControls(int cx, int cy) {
     const int sched_height = 28;
     const int button_width = 98;
     const int small_button_width = 78;
-    const int label_width = 60;
     const int combo_width = 86;
-    const int report_width = 70;
-    const int retry_label_width = 40;
-    const int retry_edit_width = 46;
-    const int retry_spin_width = 16;
     const int limit_check_width = 90;
     const int limit_edit_width = 50;
     const int limit_spin_width = 16;
@@ -462,21 +388,9 @@ void CTxPanel::LayoutControls(int cx, int cy) {
     m_intervalCombo.MoveWindow(x, y, combo_width, combo_drop_height);
     x += combo_width + gap;
 
-    m_reportLabel.MoveWindow(x, y + 3, label_width, sched_height);
-    x += label_width + gap;
-    m_reportEdit.MoveWindow(x, y, report_width, sched_height);
-    x += report_width + gap;
-
-    m_retryLabel.MoveWindow(x, y + 3, retry_label_width, sched_height);
-    x += retry_label_width + gap / 2;
-    m_retryEdit.MoveWindow(x, y, retry_edit_width, sched_height);
-    m_retrySpin.MoveWindow(x + retry_edit_width - retry_spin_width, y, retry_spin_width, sched_height);
-    x += retry_edit_width + gap;
-
     m_saveAsButton.MoveWindow(x, y, small_button_width, sched_height);
     x += small_button_width + gap;
     m_reloadButton.MoveWindow(x, y, small_button_width, sched_height);
-    x += small_button_width + gap;
 
     CClientDC dc(this);
     y += sched_height + gap;
@@ -501,14 +415,7 @@ void CTxPanel::LayoutControls(int cx, int cy) {
     m_headerHeight = tm.tmHeight + 4;
     m_rowHeight = tm.tmHeight + 6;
 
-    CString handshakeText(L"Enable Handshake (Send 1)");
-    dc.SelectObject(&m_uiFont);
-    const int handshake_base_width = m_rowButtonWidth * 2 + gap;
-    const int handshake_text_width = dc.GetTextExtent(handshakeText).cx + 36;
-    const int handshake_width = (handshake_text_width > handshake_base_width) ? handshake_text_width : handshake_base_width;
-    const int handshake_extra = handshake_width - handshake_base_width;
-
-    int edit_width = width - check_width - m_rowButtonWidth * 2 - gap * 3 - handshake_extra;
+    int edit_width = width - check_width - m_rowButtonWidth * 2 - gap * 3;
     if (edit_width < 120) {
         edit_width = 120;
     }
@@ -522,24 +429,8 @@ void CTxPanel::LayoutControls(int cx, int cy) {
     }
     int data_end = m_dataStartX + edit_width;
 
-    const int echo_height = m_rowHeight;
-    int echo_y = y;
-    y += echo_height + gap;
-
-    dc.SelectObject(&m_uiFont);
     m_headerRect = CRect(m_dataStartX, y, data_end, y + m_headerHeight);
     m_selectAllCheck.MoveWindow(margin, y, check_width, m_headerHeight);
-
-    m_echoLabel.MoveWindow(margin, echo_y + 2, check_width, echo_height);
-    int echo_x = m_dataStartX;
-    for (int i = 0; i < kByteCount; ++i) {
-        int cell_width = m_cellWidthBase + (i < m_cellWidthExtra ? 1 : 0);
-        m_echoBytes[i].MoveWindow(echo_x, echo_y, cell_width, echo_height);
-        echo_x += cell_width;
-        if (echo_x >= data_end) {
-            break;
-        }
-    }
 
     y += m_headerHeight + gap;
     m_rowsTop = y;
@@ -567,46 +458,6 @@ void CTxPanel::LayoutControls(int cx, int cy) {
 
         y += m_rowHeight + gap;
     }
-
-    int handshake_height = m_headerHeight + 4;
-    int handshake_x = data_end + gap;
-    int handshake_y = m_headerRect.top - 2;
-    if (handshake_y < 0) {
-        handshake_y = 0;
-    }
-    m_handshakeCheck.MoveWindow(handshake_x, handshake_y, handshake_width, handshake_height);
-
-    dc.SelectObject(&m_uiFont);
-    CString echoText(L"Echo Mode");
-    CString hsModeText(L"Handshake Mode");
-    int echo_mode_width = dc.GetTextExtent(echoText).cx + 24;
-    int hs_mode_width = dc.GetTextExtent(hsModeText).cx + 24;
-    const int help_width = 18;
-    const int help_gap = 4;
-    int echo_group_width = echo_mode_width + help_gap + help_width;
-    int hs_group_width = hs_mode_width + help_gap + help_width;
-    const int dot_size = 8;
-    const int dot_gap = 4;
-    int hs_indicator_width = dc.GetTextExtent(L"Handshake: WAITING").cx + dot_size + dot_gap;
-    int header_y = 4;
-    int header_h = header_height;
-    int right_edge = cx - 10;
-    int mode_right = right_edge - hs_indicator_width - gap;
-    int echo_group_x = mode_right - echo_group_width;
-    if (echo_group_x < margin + 100) {
-        echo_group_x = margin + 100;
-    }
-    m_echoModeCheck.MoveWindow(echo_group_x, header_y, echo_mode_width, header_h);
-    m_echoHelpButton.MoveWindow(echo_group_x + echo_mode_width + help_gap, header_y + 2, help_width, header_h - 4);
-    int hs_x = echo_group_x - (hs_group_width + gap);
-    if (hs_x < margin + 10) {
-        hs_x = margin + 10;
-    }
-    m_handshakeModeCheck.MoveWindow(hs_x, header_y, hs_mode_width, header_h);
-    m_handshakeHelpButton.MoveWindow(hs_x + hs_mode_width + help_gap, header_y + 2, help_width, header_h - 4);
-
-    CString titleText(L"Command Send");
-    int title_width = dc.GetTextExtent(titleText).cx;
 }
 
 void CTxPanel::OnPaint() {
@@ -636,42 +487,6 @@ void CTxPanel::OnPaint() {
     dc.SelectObject(&m_uiFont);
     dc.SetTextColor(RGB(15, 23, 42));
     dc.DrawText(L"Command Send", titleRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
-
-    const wchar_t* hs_text = L"Handshake: OFF";
-    COLORREF hs_color = RGB(148, 163, 184);
-    switch (m_handshakeState) {
-    case HsWaiting:
-        hs_text = L"Handshake: WAITING";
-        hs_color = RGB(249, 115, 22);
-        break;
-    case HsOk:
-        hs_text = L"Handshake: OK";
-        hs_color = RGB(34, 197, 94);
-        break;
-    case HsError:
-        hs_text = L"Handshake: ERROR";
-        hs_color = RGB(239, 68, 68);
-        break;
-    default:
-        hs_text = L"Handshake: OFF";
-        hs_color = RGB(148, 163, 184);
-        break;
-    }
-    CSize hs_size = dc.GetTextExtent(hs_text);
-    const int dot_size = 8;
-    const int dot_gap = 4;
-    int total_width = dot_size + dot_gap + hs_size.cx;
-    CRect hs_rect(rect.right - 10 - total_width, rect.top + 4, rect.right - 10, rect.top + 4 + header_height);
-    int dot_x = hs_rect.left;
-    int dot_y = hs_rect.top + (header_height - dot_size) / 2;
-    CBrush hs_brush(hs_color);
-    CBrush* old_brush = dc.SelectObject(&hs_brush);
-    dc.Ellipse(dot_x, dot_y, dot_x + dot_size, dot_y + dot_size);
-    dc.SelectObject(old_brush);
-    CRect text_rect = hs_rect;
-    text_rect.left += dot_size + dot_gap;
-    dc.SetTextColor(hs_color);
-    dc.DrawText(hs_text, text_rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 
     if (m_headerRect.Width() > 0) {
         dc.SelectObject(&m_monoFont);
@@ -771,13 +586,7 @@ void CTxPanel::SetRowEnabled(int row, bool enabled) {
     if (row < 0 || row >= kRowCount) {
         return;
     }
-    if (row == 0 && IsHandshakeModeEnabled()) {
-        enabled = true;
-    }
     m_rows[row].sendCheck.SetCheck(enabled ? BST_CHECKED : BST_UNCHECKED);
-    if (row == 0 && !enabled) {
-        m_handshakeCheck.SetCheck(BST_UNCHECKED);
-    }
     UpdateSelectAllState();
 }
 
@@ -790,24 +599,6 @@ void CTxPanel::SetRunning(bool running) {
     m_running = running;
     m_startButton.SetWindowTextW(running ? L"Stop TX" : L"Start TX");
     UpdateEnableStates();
-}
-
-bool CTxPanel::GetReportId(unsigned char* out_value, std::wstring* error) const {
-    if (!out_value) {
-        if (error) {
-            *error = L"Output buffer missing.";
-        }
-        return false;
-    }
-    CString text;
-    m_reportEdit.GetWindowTextW(text);
-    return ParseSingleByte(std::wstring(text), out_value, error);
-}
-
-void CTxPanel::SetReportId(unsigned char value) {
-    CString text;
-    text.Format(L"0x%02X", value);
-    m_reportEdit.SetWindowTextW(text);
 }
 
 bool CTxPanel::IsHexPrefixMode() const {
@@ -849,67 +640,6 @@ void CTxPanel::SetIntervalValue(DWORD value) {
 void CTxPanel::SetIntervalEnabled(bool enabled) {
     m_intervalCheck.SetCheck(enabled ? BST_CHECKED : BST_UNCHECKED);
     UpdateEnableStates();
-}
-
-bool CTxPanel::IsHandshakeEnabled() const {
-    return IsHandshakeModeEnabled();
-}
-
-void CTxPanel::SetHandshakeEnabled(bool enabled) {
-    m_handshakeCheck.SetCheck(enabled ? BST_CHECKED : BST_UNCHECKED);
-    if (enabled) {
-        m_rows[0].sendCheck.SetCheck(BST_CHECKED);
-    }
-    UpdateSelectAllState();
-    UpdateEnableStates();
-}
-
-int CTxPanel::GetHandshakeRetryCount() const {
-    CString text;
-    m_retryEdit.GetWindowTextW(text);
-    int value = _wtoi(text);
-    if (value < 5) {
-        value = 5;
-    }
-    return value;
-}
-
-void CTxPanel::SetHandshakeRetryCount(int count) {
-    if (count < 5) {
-        count = 5;
-    }
-    CString text;
-    text.Format(L"%d", count);
-    m_retryEdit.SetWindowTextW(text);
-    if (m_retrySpin.GetSafeHwnd()) {
-        m_retrySpin.SetPos32(count);
-    }
-}
-
-bool CTxPanel::IsEchoModeEnabled() const {
-    return m_echoModeCheck.GetCheck() == BST_CHECKED;
-}
-
-bool CTxPanel::IsHandshakeModeEnabled() const {
-    return m_handshakeModeCheck.GetCheck() == BST_CHECKED;
-}
-
-void CTxPanel::SetEchoModeEnabled(bool enabled) {
-    m_echoModeCheck.SetCheck(enabled ? BST_CHECKED : BST_UNCHECKED);
-    if (enabled) {
-        m_handshakeModeCheck.SetCheck(BST_UNCHECKED);
-    }
-    UpdateEnableStates();
-}
-
-void CTxPanel::SetHandshakeModeEnabled(bool enabled) {
-    m_handshakeModeCheck.SetCheck(enabled ? BST_CHECKED : BST_UNCHECKED);
-    if (enabled) {
-        m_echoModeCheck.SetCheck(BST_UNCHECKED);
-        m_rows[0].sendCheck.SetCheck(BST_CHECKED);
-    }
-    UpdateEnableStates();
-    UpdateSelectAllState();
 }
 
 bool CTxPanel::IsLimitEnabled() const {
@@ -969,23 +699,6 @@ void CTxPanel::SetLimitStatus(int sent, int remaining) {
     UpdateEnableStates();
 }
 
-void CTxPanel::SetLastEchoBytes(const std::vector<unsigned char>& bytes) {
-    if (!m_echoBytes[0].GetSafeHwnd()) {
-        return;
-    }
-    bool clear = bytes.empty();
-    for (int i = 0; i < kByteCount; ++i) {
-        if (clear) {
-            m_echoBytes[i].SetWindowTextW(L"");
-            continue;
-        }
-        unsigned char value = i < static_cast<int>(bytes.size()) ? bytes[static_cast<size_t>(i)] : 0x00;
-        wchar_t buf[4] = {};
-        swprintf_s(buf, L"%02X", value);
-        m_echoBytes[i].SetWindowTextW(buf);
-    }
-}
-
 void CTxPanel::GetGridMetrics(int* out_start_x, int* out_cell_base, int* out_cell_extra,
                               int* out_row_height, int* out_row_gap) const {
     if (out_start_x) {
@@ -1020,64 +733,6 @@ void CTxPanel::OnIntervalChanged() {
 void CTxPanel::OnIntervalCheck() {
     UpdateEnableStates();
     NotifyParent(ActionSettingsChanged, 0);
-}
-
-void CTxPanel::OnReportChanged() {
-    NotifyParent(ActionSettingsChanged, 0);
-}
-
-void CTxPanel::OnRetryChanged() {
-    NotifyParent(ActionSettingsChanged, 0);
-}
-
-void CTxPanel::OnRetryKillFocus() {
-    int value = GetHandshakeRetryCount();
-    SetHandshakeRetryCount(value);
-}
-
-void CTxPanel::OnEchoModeChanged() {
-    if (m_echoModeCheck.GetCheck() == BST_CHECKED) {
-        m_handshakeModeCheck.SetCheck(BST_UNCHECKED);
-    }
-    UpdateEnableStates();
-    NotifyParent(ActionSettingsChanged, 0);
-}
-
-void CTxPanel::OnHandshakeModeChanged() {
-    if (m_handshakeModeCheck.GetCheck() == BST_CHECKED) {
-        m_echoModeCheck.SetCheck(BST_UNCHECKED);
-        m_rows[0].sendCheck.SetCheck(BST_CHECKED);
-    }
-    UpdateEnableStates();
-    UpdateSelectAllState();
-    NotifyParent(ActionSettingsChanged, 0);
-}
-
-void CTxPanel::OnEchoHelpClicked() {
-    const wchar_t* message =
-        L"Echo Mode (MCU echo)\r\n"
-        L"\r\n"
-        L"PC -> MCU (OUT payload, 64 bytes)\r\n"
-        L"Enable Echo:  5A 5A EE 01 00 00 00 00 ...\r\n"
-        L"Disable Echo: 5A 5A EE 00 00 00 00 00 ...\r\n"
-        L"\r\n"
-        L"MCU -> PC (IN payload, 64 bytes)\r\n"
-        L"- MCU returns the SAME 64-byte payload as confirmation.\r\n"
-        L"- When Echo Mode is enabled, every payload you send is echoed back.\r\n";
-    AfxMessageBox(message, MB_OK | MB_ICONINFORMATION);
-}
-
-void CTxPanel::OnHandshakeHelpClicked() {
-    const wchar_t* message =
-        L"Handshake Mode (protocol verify)\r\n"
-        L"\r\n"
-        L"PC -> MCU (OUT payload, 64 bytes)\r\n"
-        L"- Uses Send 1 row as the handshake payload.\r\n"
-        L"\r\n"
-        L"MCU -> PC (IN payload, 64 bytes)\r\n"
-        L"- MCU should echo the SAME 64-byte payload.\r\n"
-        L"- Tool expects an exact match within the timeout.\r\n";
-    AfxMessageBox(message, MB_OK | MB_ICONINFORMATION);
 }
 
 void CTxPanel::OnSaveAsClicked() {
@@ -1126,29 +781,14 @@ void CTxPanel::OnSelectAllClicked() {
     for (int i = 0; i < kRowCount; ++i) {
         m_rows[i].sendCheck.SetCheck(checked ? BST_CHECKED : BST_UNCHECKED);
     }
-    if (IsHandshakeModeEnabled()) {
-        m_rows[0].sendCheck.SetCheck(BST_CHECKED);
-    }
     UpdateEnableStates();
     UpdateSelectAllState();
     m_syncingSelectAll = false;
     NotifyParent(ActionSettingsChanged, 0);
 }
 
-void CTxPanel::OnHandshakeChanged() {
-    if (IsHandshakeModeEnabled()) {
-        m_rows[0].sendCheck.SetCheck(BST_CHECKED);
-    }
-    UpdateEnableStates();
-    UpdateSelectAllState();
-    NotifyParent(ActionSettingsChanged, 0);
-}
-
 void CTxPanel::OnRowCheckChanged(UINT id) {
     int row = static_cast<int>(id) - kSendCheckBase;
-    if (row == 0 && IsHandshakeModeEnabled() && m_rows[0].sendCheck.GetCheck() != BST_CHECKED) {
-        m_rows[0].sendCheck.SetCheck(BST_CHECKED);
-    }
     UpdateSelectAllState();
     NotifyParent(ActionSettingsChanged, 0);
 }
@@ -1272,9 +912,6 @@ void CTxPanel::UpdateEnableStates() {
     const bool active = m_connected;
     const bool idle = !m_running;
     const bool limit_active = IsLimitEnabled();
-    const bool echo_mode = IsEchoModeEnabled();
-    const bool handshake_mode = IsHandshakeModeEnabled();
-    const bool allow_mode = active && idle;
 
     m_startButton.EnableWindow(active);
     m_singleShotButton.EnableWindow(active && idle && !limit_active);
@@ -1282,40 +919,20 @@ void CTxPanel::UpdateEnableStates() {
     m_intervalCheck.EnableWindow(active);
     m_intervalCombo.EnableWindow(active && m_intervalCheck.GetCheck() == BST_CHECKED);
 
-    bool report_enable = active && idle;
-    m_reportLabel.EnableWindow(report_enable);
-    m_reportEdit.EnableWindow(report_enable);
-
-    m_retryLabel.EnableWindow(active && idle);
-    m_retryEdit.EnableWindow(active && idle);
-    m_retrySpin.EnableWindow(active && idle);
-
-    m_echoModeCheck.EnableWindow(allow_mode && !handshake_mode);
-    m_handshakeModeCheck.EnableWindow(allow_mode && !echo_mode);
-    m_echoHelpButton.EnableWindow(TRUE);
-    m_handshakeHelpButton.EnableWindow(TRUE);
-
     m_limitCheck.EnableWindow(active && idle);
     m_limitEdit.EnableWindow(active && idle);
     m_limitSpin.EnableWindow(active && idle);
 
-    m_handshakeCheck.EnableWindow(FALSE);
     m_selectAllCheck.EnableWindow(active && idle);
-    const bool handshake_send1_locked = handshake_mode;
-    if (handshake_send1_locked && m_rows[0].sendCheck.GetCheck() != BST_CHECKED) {
-        m_rows[0].sendCheck.SetCheck(BST_CHECKED);
-        UpdateSelectAllState();
-    }
 
     for (int i = 0; i < kRowCount; ++i) {
-        const bool row_locked = (i == 0 && handshake_send1_locked);
-        const bool row_send_enabled = active && idle && !row_locked;
+        const bool row_send_enabled = active && idle;
         m_rows[i].sendCheck.EnableWindow(row_send_enabled);
         for (int j = 0; j < kByteCount; ++j) {
-            m_rows[i].bytes[j].EnableWindow(active && idle && !row_locked);
+            m_rows[i].bytes[j].EnableWindow(active && idle);
         }
-        m_rows[i].restoreButton.EnableWindow(active && idle && !row_locked);
-        m_rows[i].sendOnceButton.EnableWindow(active && idle && !row_locked);
+        m_rows[i].restoreButton.EnableWindow(active && idle);
+        m_rows[i].sendOnceButton.EnableWindow(active && idle);
     }
 }
 bool CTxPanel::GetByteValue(int row, int col, unsigned char* out_value) const {
@@ -1355,14 +972,6 @@ bool CTxPanel::PasteBytes(int row, int col, const std::wstring& text) {
         m_rows[row].bytes[idx].SetSel(0, 2);
     }
     return true;
-}
-
-void CTxPanel::SetHandshakeState(int state) {
-    if (m_handshakeState == state) {
-        return;
-    }
-    m_handshakeState = state;
-    Invalidate(FALSE);
 }
 
 void CTxPanel::NotifyHover(int row, int col) {
@@ -1460,12 +1069,9 @@ int CTxPanel::GetPreferredHeight() const {
         }
         dc.SelectObject(old);
     }
-    int echo_height = row_height;
-
     int total = margin + title_height + header_gap;
     total += sched_height + gap;
     total += limit_height + gap;
-    total += echo_height + gap;
     total += header_height + gap;
     total += kRowCount * row_height;
     total += (kRowCount - 1) * gap;
