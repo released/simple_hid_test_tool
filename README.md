@@ -195,6 +195,7 @@ typedef struct tcp_tool_get_info_payload
 - `0x03` `GET_UPTIME`
   - Request payload: none
 
+<<<<<<< HEAD
 ```c
 typedef struct tcp_tool_uptime_payload
 {
@@ -234,6 +235,21 @@ typedef struct tcp_tool_uptime_payload
 - `0x33` `RESET_MCU`
   - Request payload: none
   - Response payload: none
+=======
+`build_release.bat` behavior:
+- Stops running `HidTestTool.exe` before build
+- Relaunches `build\HidTestTool.exe` after successful build
+
+## Clean Compiler Intermediates
+
+```bat
+scripts\clean_build.bat
+```
+
+Behavior:
+- Removes known compiler/linker intermediates such as `build\obj` and debug symbol files
+- Preserves EXE, INI/profile files, required DLLs, data, logs, and unknown delivery files
+>>>>>>> 8da8a57074b3ae4bdf94a9994e982d1d1a285ef7
 
 ### APP Behavior
 

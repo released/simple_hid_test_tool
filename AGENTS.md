@@ -6,7 +6,25 @@ This file applies to this repository.
 
 ## Project Summary
 
+<<<<<<< HEAD
 `TCPTestTool` is an MFC desktop TCP client derived from the older HID test tool.
+=======
+### 1.1 Platform / Build Constraints
+- OS: Windows 10/11 x64
+- Language: C++
+- UI: MFC (MFC in Shared DLL = No)
+- Runtime: Static linking (/MT)
+- HID API: SetupAPI + hid.dll (Windows HID class driver)
+- No third-party libraries
+- Build script: `scripts\build_release.bat`
+- Clean script: `scripts\clean_build.bat` (removes compiler intermediates only; preserves delivery/runtime files)
+- Build outputs:
+  - `build\HidTestTool.exe`
+  - `build\obj\x64\Release\HidTestTool.pdb`
+- Build script behavior:
+  - Stops any running `HidTestTool.exe` before build
+  - After successful build, closes any running instance and relaunches `build\HidTestTool.exe`
+>>>>>>> 8da8a57074b3ae4bdf94a9994e982d1d1a285ef7
 
 Current behavior:
 
