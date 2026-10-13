@@ -16,7 +16,7 @@
 - HID API: SetupAPI + hid.dll (Windows HID class driver)
 - No third-party libraries
 - Build script: `scripts\build_release.bat`
-- Clean script: `scripts\clean_build.bat` (keeps only `build\HidTestTool.exe`)
+- Clean script: `scripts\clean_build.bat` (removes compiler intermediates only; preserves delivery/runtime files)
 - Build outputs:
   - `build\HidTestTool.exe`
   - `build\obj\x64\Release\HidTestTool.pdb`

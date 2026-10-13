@@ -572,10 +572,10 @@ Result: PASS / FAIL
 
 Result: PASS / FAIL
 
-[BLD-04] Clean script keep exe only
+[BLD-04] Clean script safety
 - Run `scripts\clean_build.bat`
-- Verify `build\HidTestTool.exe` is kept (if existed before clean)
-- Verify all other files/folders under `build\` are removed
+- Verify compiler/linker intermediates are removed
+- Verify EXE, INI/profile files, required DLLs, data, logs, and an unknown sentinel file are preserved
 
 Result: PASS / FAIL
 

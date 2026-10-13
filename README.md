@@ -119,15 +119,15 @@ Outputs:
 - Stops running `HidTestTool.exe` before build
 - Relaunches `build\HidTestTool.exe` after successful build
 
-## Clean (Keep EXE Only)
+## Clean Compiler Intermediates
 
 ```bat
 scripts\clean_build.bat
 ```
 
 Behavior:
-- Cleans everything under `build\`
-- Keeps only `build\HidTestTool.exe`
+- Removes known compiler/linker intermediates such as `build\obj` and debug symbol files
+- Preserves EXE, INI/profile files, required DLLs, data, logs, and unknown delivery files
 
 ## Startup and Layout
 
