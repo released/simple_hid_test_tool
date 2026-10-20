@@ -3,7 +3,7 @@
 Windows MFC HID 測試工具（64-byte payload），用於送命令、收回應、驗證 Echo / Handshake 流程。
 
 
-![image](https://github.com/released/HidTestTool/blob/main/main_window.jpg) 
+![image](docs/images/main_window.jpg)
 
 ## Build
 
@@ -26,8 +26,10 @@ scripts\clean_build.bat
 ```
 
 行為：
-- 清理 `build\` 內所有內容
-- 只保留 `build\HidTestTool.exe`
+- 僅清除已明列的編譯／連結暫存檔，不會淨空 `build\`。
+- 保留 EXE、INI、必要 DLL、資料、log、測試證據與其他未知交付檔案。
+
+統一入口：`scripts\build_release_mfc.bat`、`scripts\clean_mfc.bat`；舊入口仍可使用。
 
 ## 啟動與介面
 

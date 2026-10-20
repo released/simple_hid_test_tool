@@ -7,6 +7,16 @@ This self-review is mandatory.
 Do NOT skip any item.
 Report PASS / FAIL for each test case.
 
+## Layout Audit 2026-10-20
+
+- Screenshot moved to `docs/images/main_window.jpg` with no overwrite and SHA-256 verification; README uses a relative link instead of an old repository URL.
+- Added compatible `scripts/build_release_mfc.bat` and `scripts/clean_mfc.bat` aliases. Original entries and application behavior remain unchanged.
+- PASS: `scripts/build.ps1 -Configuration Release -Platform x64`; Release x64, 0 warnings/errors. No user instance was force-closed and no device was connected for the audit.
+- PASS: actual `scripts/clean_mfc.bat`; 4 existing protected build files unchanged by SHA-256.
+- PASS: isolated clean sentinels/idempotence (9 protected build files plus source).
+- NOT RUN: fresh UI/device/parser functional acceptance; this is a directory/script-alias change, not a claim that every product checklist passed.
+- Commit/push status is recorded in workspace `#READ_ME_FIRST#/PROJECT_LAYOUT_MIGRATION.md`.
+
 ==================================================
 Self-Review Rules
 ==================================================
