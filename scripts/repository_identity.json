@@ -1,0 +1,6 @@
+{
+  "publication_enabled": true,
+  "github_repository": "released/simple_hid_test_tool",
+  "solution": "HidTestTool.sln",
+  "forbidden_solution": "TCPTestTool.sln"
+}

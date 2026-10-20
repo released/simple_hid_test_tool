@@ -2,6 +2,8 @@
 setlocal
 
 pushd "%~dp0\.."
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0verify_repo_identity.ps1" -SourceOnly -InstallHook
+if errorlevel 1 exit /b %errorlevel%
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$proc = Get-Process -Name 'HidTestTool' -ErrorAction SilentlyContinue;" ^
   "if ($proc) { $proc | Stop-Process -Force }"

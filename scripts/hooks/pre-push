@@ -1,0 +1,5 @@
+#!/bin/sh
+# Versioned hook; normal project builds install it without replacing other hooks.
+root=$(git rev-parse --show-toplevel) || exit 1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$root/scripts/verify_repo_identity.ps1" -PushUrl "$2"
+exit $?

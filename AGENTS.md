@@ -15,6 +15,13 @@
 
 ## 1. Base Specification (Current UI Baseline)
 
+### Repository Identity
+
+- Only publish this HID project to `released/simple_hid_test_tool`; `released/HidTestTool` is an old redirect, not a TCP repository.
+- Before publication Codex must check live destination contents and run `scripts/verify_repo_identity.ps1`. Do not blindly pull a remote containing TCPTestTool.
+- Normal builds automatically run source validation and install the versioned pre-push guard. Preserve custom hooks and never bypass the guard; a source archive can build without Git.
+- Keep TCP local-only under its own project folder until separately authorized. Preserve both histories; no force push.
+
 ### 1.1 Platform / Build Constraints
 - OS: Windows 10/11 x64
 - Language: C++

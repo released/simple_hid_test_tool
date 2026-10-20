@@ -3,6 +3,9 @@ param(
     [ValidateSet("Win32", "x64")][string]$Platform = "x64"
 )
 
+$ErrorActionPreference = 'Stop'
+& "$PSScriptRoot\verify_repo_identity.ps1" -SourceOnly -InstallHook
+
 $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
 if (-not (Test-Path $vswhere)) {
     Write-Error "vswhere not found. Please run from a Visual Studio Developer PowerShell or install Visual Studio."

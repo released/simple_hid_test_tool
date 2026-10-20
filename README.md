@@ -7,6 +7,11 @@ Windows MFC HID 測試工具（64-byte payload），用於送命令、收回應�
 
 ## Build
 
+Repository: [released/simple_hid_test_tool](https://github.com/released/simple_hid_test_tool).
+舊網址 `released/HidTestTool` 會轉向同一個 HID repo，不能拿來上傳 TCP 工具。
+建置會自動檢查專案身分、未解決合併標記並安裝 pre-push 防錯推檢查，不需額外手動安裝。
+此檢查不會取代上傳前核對遠端實際內容；請勿使用 `--no-verify` 繞過。
+
 ```bat
 scripts\build_release.bat
 ```

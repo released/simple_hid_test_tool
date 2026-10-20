@@ -1,10 +1,26 @@
 # HANDOFF.md
-Last updated: 2026-02-13
-Workspace: `d:\SourceCode\python\_HidTestTool`
+Last updated: 2026-10-20
+Workspace: `D:\SourceCode\python\simple_hid_test_tool`
 
 ---
 
-## Layout Audit 2026-10-20
+## Repository Repair 2026-10-20
+
+- Canonical destination: `https://github.com/released/simple_hid_test_tool.git`.
+- The old `released/HidTestTool` URL redirects to this same repository; it is NOT a separate TCP repository.
+- Remote main `4a8bb0410b559be2b5b754718273ea6f5857be67` accidentally contained TCPTestTool. Local HID layout commit `32e7ae7` was preserved, and merge `7f0d1e3` restores its HID tree while retaining the TCP commit as an ancestor. No force push/history deletion.
+- Local safety branches: `backup/hid-before-repair-20261020` and `backup/accidental-tcp-before-repair-20261020`.
+- Added `scripts/repository_identity.json`, `verify_repo_identity.ps1`, versioned `hooks/pre-push`, and `test_repo_identity.ps1`. Normal PowerShell/batch builds validate source and install the guard automatically; a custom existing hook is never overwritten.
+- PASS: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_repo_identity.ps1`: 15 offline checks, including expected/opposite solution, merge markers, URLs, missing origin, idempotent install and custom-hook preservation.
+- PASS: installed pre-push accepts the canonical HID URL and rejects the old redirected alias. This is a local accident-prevention check, not server-side security; never bypass it with `--no-verify`.
+- PASS: `scripts/build.ps1 -Configuration Release -Platform x64`: 0 warnings, 0 errors; rebuilt the already tracked `build/HidTestTool.exe`.
+- PASS: shared isolated startup/frame/normal-close test, exit 0. The first probe mistakenly selected the Afx splash and timed out; after requiring a captioned main frame the test passed. No application source was changed to accommodate the probe.
+- PASS: shared clean-preservation verifier with `-CleanBatch scripts/clean_mfc.bat -CleanActualProject`: 9 protected fixture build files plus source retained, repeat clean passed, 4 actual protected build files unchanged (SHA-256).
+- PASS: workspace static clean scan, 51 scripts with no known whole-build deletion pattern (not a universal safety proof).
+- NOT RUN: physical HID/Echo/Handshake, full visual/DPI and Debug acceptance; no device commands were sent. The auto-close/relaunch batch wrapper was not executed because it force-closes existing instances.
+- Publication result and exact final commit are recorded in workspace `#READ_ME_FIRST#/PROJECT_LAYOUT_MIGRATION.md`.
+
+## Earlier Layout Audit 2026-10-20
 
 - Screenshot moved to `docs/images/main_window.jpg` with no overwrite and SHA-256 verification; README uses a relative link instead of an old repository URL.
 - Added compatible `scripts/build_release_mfc.bat` and `scripts/clean_mfc.bat` aliases. Original entries and application behavior remain unchanged.
