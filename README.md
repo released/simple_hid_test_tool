@@ -5,6 +5,13 @@ Windows MFC HID 測試工具（64-byte payload），用於送命令、收回應�
 
 ![image](docs/images/main_window.jpg)
 
+## Compiler-Only Clean
+
+`scripts/clean_mfc.bat` and the existing clean entry remove known compiler files
+only. Complete path/link preflight rejects reparse points before deletion;
+EXE/INI/DLL/data/log/evidence/unknowns are preserved even under obj/tests/verify.
+No additional manual setup is required.
+
 ## Build
 
 Repository: [released/simple_hid_test_tool](https://github.com/released/simple_hid_test_tool).
