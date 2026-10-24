@@ -5,6 +5,16 @@ Windows MFC HID 測試工具（64-byte payload），用於送命令、收回應�
 
 ![image](docs/images/main_window.jpg)
 
+## Release EXE size reduction (2026-10-25)
+
+Release x64 EXE: 2,821,632 -> 778,240 bytes.
+Unused MFC control registration is excluded; static runtime, security, actual
+controls and protocol/firmware features remain. The existing shared-image-list Debug defect is also fixed.
+Isolated startup, controls, Debug normal-close and 15 paired performance samples
+passed. See SELF_CHECK.md for scope, original timing failures and actual clean
+preservation. Physical-device, visual/DPI and clean-PC acceptance are not claimed.
+
+
 ## Compiler-Only Clean
 
 `scripts/clean_mfc.bat` and the existing clean entry remove known compiler files

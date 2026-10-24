@@ -1,11 +1,40 @@
 ﻿Post-Generation Self-Review Checklist (CURRENT)
 
-After completing code generation, you MUST perform a self-review
-against the following checklist.
+After code changes, select the affected cases for mandatory self-review.
+The full list is a menu, not a requirement to repeat unrelated hardware tests.
+Report actual PASS / FAIL / NOT RUN and identify reused unchanged evidence.
 
-This self-review is mandatory.
-Do NOT skip any item.
-Report PASS / FAIL for each test case.
+## Verified x64 EXE slimming 2026-10-25
+
+- PASS comparable Release baseline 2821632 bytes (original 2821632),
+  formal 778240; SHA ACD01BB26FE56E86F9BE40159A7147C90AF65E9BF65D71DB87AB507300E57742.
+- PASS scripts/build.ps1 -Configuration Release -Platform x64; isolated Debug with version prebuild disabled.
+  Release 0 warnings/errors; Debug retains 2 preexisting C4189 unused-variable warnings.
+- PASS hash-matched fresh own-process fixtures: identical child-control class counts,
+  native file dialog open/cancel, Debug without assertion and normal exit 0. No real INIs,
+  Connect, report writes, flash or clipboard actions. Passive Windows device discovery
+  may occur as in normal disconnected startup; it is not a hardware I/O validation.
+- Original unmodified Debug reproduced winctrl2.cpp:1445 double image-list
+  attachment. TX row buttons now create each shared image list once; current Debug
+  starts/closes without assertions. No HID report/scheduler behavior changed.
+- Original five-pair timing failure is retained in the JSON evidence. One fixed
+  15-pair confirmation used the unchanged predeclared calibration formula and passed.
+- PASS existing static runtime, compiler optimization/security, x64 PE 0x8160;
+  unused VisualManager RTTI absent. Only the TX image-list lifetime fix above changes app source.
+- PASS scoped timing: two warmups, baseline calibration before Release candidate,
+  15 alternating AB/BA pairs without concurrent compilation. Delta max(floor,
+  10% baseline median, 3*MAD); memory 5%; floors startup25/UI2/CPU16ms, memory1MiB.
+  - StartupMs: 4304.1304 -> 4144.6936; limit 5469.1304.
+  - PeakBytes: 21696512.0000 -> 21082112.0000; limit 22782566.0000.
+  - CpuMs: 2890.6250 -> 2968.7500; limit 3265.6250.
+  - WorkflowMs: 1.7666 -> 2.2633; limit 3.7666.
+- Raw numeric samples/limits/original failed timing: docs/verification/exe-slimming-20261025.json.
+- PASS actual clean_mfc.bat: 33 compiler files removed, 4 protected actual files
+  SHA unchanged; 17 nested fixture files/source, help/idempotence PASS. Earlier
+  unchanged junction/firmware/core evidence reused; private root INI hashes preserved.
+- NOT RUN: physical-device/protocol throughput, unrelated firmware, visual/DPI,
+  clean-PC, Win32. This scoped MFC change does not require a full hardware suite.
+
 
 ## Clean Safety Follow-up 2026-10-20
 

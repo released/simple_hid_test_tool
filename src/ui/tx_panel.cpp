@@ -248,8 +248,13 @@ int CTxPanel::OnCreate(LPCREATESTRUCT lpCreateStruct) {
                            FIXED_PITCH | FF_MODERN, L"Consolas");
 
     auto set_icon = [](CButton& button, CImageList& list, HICON icon) {
-        list.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1);
-        list.Add(icon);
+        // Row buttons share one image list; create it only once.
+        if (!list.GetSafeHandle()) {
+            if (!list.Create(16, 16, ILC_COLOR32 | ILC_MASK, 1, 1)) {
+                return;
+            }
+            list.Add(icon);
+        }
         BUTTON_IMAGELIST bi = {};
         bi.himl = list.GetSafeHandle();
         bi.uAlign = BUTTON_IMAGELIST_ALIGN_LEFT;

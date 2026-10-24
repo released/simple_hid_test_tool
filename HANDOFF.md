@@ -4,6 +4,25 @@ Workspace: `D:\SourceCode\python\simple_hid_test_tool`
 
 ---
 
+## Verified x64 EXE slimming 2026-10-25
+
+- EXE 2821632 -> 778240 bytes; formal SHA
+  ACD01BB26FE56E86F9BE40159A7147C90AF65E9BF65D71DB87AB507300E57742.
+- Canonical Release and isolated Debug PASS; owned control classes/normal exit 0
+  and native load/browse dialog cancellation PASS.
+- Original unmodified Debug reproduced winctrl2.cpp:1445 double image-list
+  attachment. TX row buttons now create each shared image list once; current Debug
+  starts/closes without assertions. No HID report/scheduler behavior changed.
+- Original five-pair timing failure is retained in the JSON evidence. One fixed
+  15-pair confirmation used the unchanged predeclared calibration formula and passed.
+- Actual clean removed 33 compiler files; 4 protected actual files unchanged
+  by SHA. Nested 17-file/source fixtures, help/idempotence and root INI hashes PASS.
+- Firmware, protocol and developer examples retained. Unchanged earlier firmware/
+  core-conformance/junction evidence reused; not a new physical-device acceptance.
+- Raw sanitized samples/limits: docs/verification/exe-slimming-20261025.json.
+  Publication result/remote SHA: shared EXE_SLIMMING_PROGRESS.md.
+
+
 ## Clean Safety Follow-up 2026-10-20
 
 - Replaced named-directory purges with a standalone compiler-file allowlist; canonical and legacy entries share the same helper and support non-destructive help.

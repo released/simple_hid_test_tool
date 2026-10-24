@@ -1,4 +1,15 @@
 ﻿# AGENTS.md
+## Verified x64 size configuration (2026-10-25)
+
+- Only x64 defines _AFX_NO_MFC_CONTROLS_IN_DIALOGS after standard/common/custom
+  control review. Reassess before introducing CMFC controls; keep Win32 unchanged.
+- Keep existing Release optimization, /GL, static /MT, /GS and PE security;
+  never trade device/protocol features or installation requirements for fewer bytes.
+- Validate hash-matched isolated Release/Debug startup/control/modal/close paths,
+  scoped paired performance and actual clean; use no personal INI/device commands.
+- Actual results/raw timing: SELF_CHECK.md and docs/verification/exe-slimming-20261025.json.
+
+
 ## Compiler-File Clean Safety
 
 - Both canonical/legacy clean entries use standalone `scripts/clean_intermediates.ps1`.

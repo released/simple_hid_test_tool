@@ -1,0 +1,509 @@
+{
+  "Date": "2026-10-25",
+  "Target": "Release|x64",
+  "Toolchain": "MSVC 14.44.35207",
+  "OriginalExeBytes": 2821632,
+  "BaselineBytes": 2821632,
+  "FormalBytes": 778240,
+  "BaselineSHA256": "018A09FD847C4FF0E1EC28A54B6EC3472E82790F629D2560F39DDD53A1C9EB33",
+  "FormalSHA256": "ACD01BB26FE56E86F9BE40159A7147C90AF65E9BF65D71DB87AB507300E57742",
+  "Samples": 15,
+  "Order": "baseline calibration before candidate; alternating AB/BA measured pairs",
+  "Limits": {
+    "StartupMs": {
+      "Median": 3819.2469,
+      "MAD": 388.2547999999997,
+      "AllowedDelta": 1165
+    },
+    "PeakBytes": {
+      "Median": 21721088,
+      "MAD": 12288,
+      "AllowedDelta": 1086054
+    },
+    "CpuMs": {
+      "Median": 2734.375,
+      "MAD": 125,
+      "AllowedDelta": 375
+    },
+    "WorkflowMs": {
+      "Median": 1.9016000000000002,
+      "MAD": 0.6438999999999999,
+      "AllowedDelta": 2
+    }
+  },
+  "Checks": [
+    {
+      "Metric": "StartupMs",
+      "BaselineMedian": 4304.1304,
+      "CandidateMedian": 4144.6936000000005,
+      "Limit": 5469.1304,
+      "Pass": true
+    },
+    {
+      "Metric": "PeakBytes",
+      "BaselineMedian": 21696512,
+      "CandidateMedian": 21082112,
+      "Limit": 22782566,
+      "Pass": true
+    },
+    {
+      "Metric": "CpuMs",
+      "BaselineMedian": 2890.625,
+      "CandidateMedian": 2968.75,
+      "Limit": 3265.625,
+      "Pass": true
+    },
+    {
+      "Metric": "WorkflowMs",
+      "BaselineMedian": 1.7666000000000002,
+      "CandidateMedian": 2.2633,
+      "Limit": 3.7666000000000004,
+      "Pass": true
+    }
+  ],
+  "Calibration": [
+    {
+      "StartupMs": 3785.3253,
+      "WorkflowMs": 0.9198000000000001,
+      "CpuMs": 2750,
+      "PeakBytes": 21708800
+    },
+    {
+      "StartupMs": 3246.2281000000003,
+      "WorkflowMs": 1.5366,
+      "CpuMs": 2609.375,
+      "PeakBytes": 21762048
+    },
+    {
+      "StartupMs": 3034.8009,
+      "WorkflowMs": 1.9016000000000002,
+      "CpuMs": 2343.75,
+      "PeakBytes": 21721088
+    },
+    {
+      "StartupMs": 3053.9152000000004,
+      "WorkflowMs": 0.9732000000000001,
+      "CpuMs": 2468.75,
+      "PeakBytes": 21721088
+    },
+    {
+      "StartupMs": 3070.9472,
+      "WorkflowMs": 2.5455,
+      "CpuMs": 2562.5,
+      "PeakBytes": 21721088
+    },
+    {
+      "StartupMs": 3819.2469,
+      "WorkflowMs": 1.8906,
+      "CpuMs": 2609.375,
+      "PeakBytes": 21733376
+    },
+    {
+      "StartupMs": 3967.1509,
+      "WorkflowMs": 2.7628,
+      "CpuMs": 3156.25,
+      "PeakBytes": 21708800
+    },
+    {
+      "StartupMs": 4272.9475,
+      "WorkflowMs": 1.7945,
+      "CpuMs": 3203.125,
+      "PeakBytes": 21729280
+    },
+    {
+      "StartupMs": 4850.3219,
+      "WorkflowMs": 2.3332,
+      "CpuMs": 3453.125,
+      "PeakBytes": 21733376
+    },
+    {
+      "StartupMs": 3850.5609000000004,
+      "WorkflowMs": 2.5749,
+      "CpuMs": 2687.5,
+      "PeakBytes": 21700608
+    },
+    {
+      "StartupMs": 3886.4350000000004,
+      "WorkflowMs": 2.1314,
+      "CpuMs": 2828.125,
+      "PeakBytes": 21700608
+    },
+    {
+      "StartupMs": 3996.8446000000004,
+      "WorkflowMs": 1.1259000000000001,
+      "CpuMs": 2859.375,
+      "PeakBytes": 21700608
+    },
+    {
+      "StartupMs": 3775.3474,
+      "WorkflowMs": 2.7151,
+      "CpuMs": 2734.375,
+      "PeakBytes": 21708800
+    },
+    {
+      "StartupMs": 3709.8291000000004,
+      "WorkflowMs": 1.445,
+      "CpuMs": 2718.75,
+      "PeakBytes": 21696512
+    },
+    {
+      "StartupMs": 3430.9921000000004,
+      "WorkflowMs": 1.6788,
+      "CpuMs": 2687.5,
+      "PeakBytes": 21716992
+    }
+  ],
+  "Baseline": [
+    {
+      "StartupMs": 4301.4779,
+      "WorkflowMs": 1.7243000000000002,
+      "CpuMs": 2687.5,
+      "PeakBytes": 21741568
+    },
+    {
+      "StartupMs": 3700.4572000000003,
+      "WorkflowMs": 1.6994,
+      "CpuMs": 2765.625,
+      "PeakBytes": 21696512
+    },
+    {
+      "StartupMs": 3764.3208,
+      "WorkflowMs": 1.3855000000000002,
+      "CpuMs": 2593.75,
+      "PeakBytes": 21671936
+    },
+    {
+      "StartupMs": 3978.9452,
+      "WorkflowMs": 2.0395000000000003,
+      "CpuMs": 2890.625,
+      "PeakBytes": 21712896
+    },
+    {
+      "StartupMs": 4308.4738,
+      "WorkflowMs": 1.498,
+      "CpuMs": 3484.375,
+      "PeakBytes": 21688320
+    },
+    {
+      "StartupMs": 4304.1304,
+      "WorkflowMs": 1.5297,
+      "CpuMs": 3375,
+      "PeakBytes": 21700608
+    },
+    {
+      "StartupMs": 5145.378900000001,
+      "WorkflowMs": 2.9744,
+      "CpuMs": 3796.875,
+      "PeakBytes": 21663744
+    },
+    {
+      "StartupMs": 4676.0807,
+      "WorkflowMs": 1.8114000000000001,
+      "CpuMs": 3828.125,
+      "PeakBytes": 21671936
+    },
+    {
+      "StartupMs": 4943.376200000001,
+      "WorkflowMs": 1.0633000000000001,
+      "CpuMs": 2843.75,
+      "PeakBytes": 21700608
+    },
+    {
+      "StartupMs": 4437.871,
+      "WorkflowMs": 2.4650000000000003,
+      "CpuMs": 3156.25,
+      "PeakBytes": 21708800
+    },
+    {
+      "StartupMs": 4584.4785,
+      "WorkflowMs": 2.1510000000000002,
+      "CpuMs": 3281.25,
+      "PeakBytes": 21676032
+    },
+    {
+      "StartupMs": 3625.6612,
+      "WorkflowMs": 1.4263000000000001,
+      "CpuMs": 2781.25,
+      "PeakBytes": 21688320
+    },
+    {
+      "StartupMs": 3793.8274,
+      "WorkflowMs": 1.7666000000000002,
+      "CpuMs": 2796.875,
+      "PeakBytes": 21688320
+    },
+    {
+      "StartupMs": 3897.2833,
+      "WorkflowMs": 1.7214,
+      "CpuMs": 2765.625,
+      "PeakBytes": 21741568
+    },
+    {
+      "StartupMs": 3931.1681000000003,
+      "WorkflowMs": 2.3108,
+      "CpuMs": 2828.125,
+      "PeakBytes": 21667840
+    }
+  ],
+  "Candidate": [
+    {
+      "StartupMs": 3442.4935,
+      "WorkflowMs": 1.7889000000000002,
+      "CpuMs": 2765.625,
+      "PeakBytes": 21114880
+    },
+    {
+      "StartupMs": 3486.6161,
+      "WorkflowMs": 1.4231,
+      "CpuMs": 2687.5,
+      "PeakBytes": 21082112
+    },
+    {
+      "StartupMs": 3628.1007,
+      "WorkflowMs": 1.9718,
+      "CpuMs": 3062.5,
+      "PeakBytes": 21065728
+    },
+    {
+      "StartupMs": 3554.2233,
+      "WorkflowMs": 1.5816000000000001,
+      "CpuMs": 2875,
+      "PeakBytes": 21057536
+    },
+    {
+      "StartupMs": 4642.2373,
+      "WorkflowMs": 1.0623,
+      "CpuMs": 3609.375,
+      "PeakBytes": 21110784
+    },
+    {
+      "StartupMs": 4144.6936000000005,
+      "WorkflowMs": 2.7720000000000002,
+      "CpuMs": 3015.625,
+      "PeakBytes": 21053440
+    },
+    {
+      "StartupMs": 4226.5976,
+      "WorkflowMs": 2.5014000000000003,
+      "CpuMs": 3187.5,
+      "PeakBytes": 21086208
+    },
+    {
+      "StartupMs": 4741.3203,
+      "WorkflowMs": 4.8213,
+      "CpuMs": 3406.25,
+      "PeakBytes": 21106688
+    },
+    {
+      "StartupMs": 4330.3874000000005,
+      "WorkflowMs": 1.5194,
+      "CpuMs": 3109.375,
+      "PeakBytes": 21078016
+    },
+    {
+      "StartupMs": 3874.8783000000003,
+      "WorkflowMs": 2.8781000000000003,
+      "CpuMs": 2843.75,
+      "PeakBytes": 21078016
+    },
+    {
+      "StartupMs": 3719.61,
+      "WorkflowMs": 3.7952000000000004,
+      "CpuMs": 2968.75,
+      "PeakBytes": 21053440
+    },
+    {
+      "StartupMs": 4268.0572,
+      "WorkflowMs": 2.1313,
+      "CpuMs": 2937.5,
+      "PeakBytes": 21069824
+    },
+    {
+      "StartupMs": 3497.3198,
+      "WorkflowMs": 1.5250000000000001,
+      "CpuMs": 2703.125,
+      "PeakBytes": 21118976
+    },
+    {
+      "StartupMs": 3734.6323,
+      "WorkflowMs": 2.2633,
+      "CpuMs": 2796.875,
+      "PeakBytes": 21073920
+    },
+    {
+      "StartupMs": 4165.203,
+      "WorkflowMs": 2.5927000000000002,
+      "CpuMs": 2859.375,
+      "PeakBytes": 21082112
+    }
+  ],
+  "InitialTimingGate": {
+    "Samples": 5,
+    "Limits": {
+      "StartupMs": {
+        "Median": 3118.1141000000002,
+        "MAD": 113.9340000000002,
+        "AllowedDelta": 342
+      },
+      "PeakBytes": {
+        "Median": 21716992,
+        "MAD": 4096,
+        "AllowedDelta": 1085850
+      },
+      "CpuMs": {
+        "Median": 2468.75,
+        "MAD": 93.75,
+        "AllowedDelta": 281
+      },
+      "WorkflowMs": {
+        "Median": 1.0156,
+        "MAD": 0.2639,
+        "AllowedDelta": 2
+      }
+    },
+    "Checks": [
+      {
+        "Metric": "StartupMs",
+        "BaselineMedian": 3790.6105000000002,
+        "CandidateMedian": 3705.2843000000003,
+        "Limit": 4132.610500000001,
+        "Pass": true
+      },
+      {
+        "Metric": "PeakBytes",
+        "BaselineMedian": 21704704,
+        "CandidateMedian": 21098496,
+        "Limit": 22790554,
+        "Pass": true
+      },
+      {
+        "Metric": "CpuMs",
+        "BaselineMedian": 2703.125,
+        "CandidateMedian": 3031.25,
+        "Limit": 2984.125,
+        "Pass": false
+      },
+      {
+        "Metric": "WorkflowMs",
+        "BaselineMedian": 1.953,
+        "CandidateMedian": 2.1883,
+        "Limit": 3.9530000000000003,
+        "Pass": true
+      }
+    ],
+    "Calibration": [
+      {
+        "StartupMs": 3241.2677000000003,
+        "WorkflowMs": 1.4858,
+        "CpuMs": 2578.125,
+        "PeakBytes": 21741568
+      },
+      {
+        "StartupMs": 2960.1819,
+        "WorkflowMs": 0.7517,
+        "CpuMs": 2562.5,
+        "PeakBytes": 21708800
+      },
+      {
+        "StartupMs": 3118.1141000000002,
+        "WorkflowMs": 1.0156,
+        "CpuMs": 2468.75,
+        "PeakBytes": 21716992
+      },
+      {
+        "StartupMs": 3127.8589,
+        "WorkflowMs": 1.8342,
+        "CpuMs": 2312.5,
+        "PeakBytes": 21721088
+      },
+      {
+        "StartupMs": 3004.1801,
+        "WorkflowMs": 0.8104,
+        "CpuMs": 2468.75,
+        "PeakBytes": 21716992
+      }
+    ],
+    "Baseline": [
+      {
+        "StartupMs": 3547.4659,
+        "WorkflowMs": 1.8371000000000002,
+        "CpuMs": 2703.125,
+        "PeakBytes": 21676032
+      },
+      {
+        "StartupMs": 4118.6731,
+        "WorkflowMs": 1.7436,
+        "CpuMs": 3062.5,
+        "PeakBytes": 21721088
+      },
+      {
+        "StartupMs": 4198.2825,
+        "WorkflowMs": 2.2305,
+        "CpuMs": 3015.625,
+        "PeakBytes": 21671936
+      },
+      {
+        "StartupMs": 3532.6268,
+        "WorkflowMs": 1.953,
+        "CpuMs": 2687.5,
+        "PeakBytes": 21704704
+      },
+      {
+        "StartupMs": 3790.6105000000002,
+        "WorkflowMs": 2.2725,
+        "CpuMs": 2640.625,
+        "PeakBytes": 21712896
+      }
+    ],
+    "Candidate": [
+      {
+        "StartupMs": 3414.2951000000003,
+        "WorkflowMs": 3.0769,
+        "CpuMs": 2703.125,
+        "PeakBytes": 21114880
+      },
+      {
+        "StartupMs": 3705.2843000000003,
+        "WorkflowMs": 1.4345,
+        "CpuMs": 2656.25,
+        "PeakBytes": 21094400
+      },
+      {
+        "StartupMs": 3600.8669,
+        "WorkflowMs": 2.1883,
+        "CpuMs": 3109.375,
+        "PeakBytes": 21098496
+      },
+      {
+        "StartupMs": 4551.5933,
+        "WorkflowMs": 1.2041,
+        "CpuMs": 3515.625,
+        "PeakBytes": 21118976
+      },
+      {
+        "StartupMs": 4213.8638,
+        "WorkflowMs": 2.2461,
+        "CpuMs": 3031.25,
+        "PeakBytes": 21098496
+      }
+    ]
+  },
+  "TimingDisposition": "Initial five-pair failure retained; one predeclared 15-pair confirmation with unchanged gate formula passed. No further timing retries.",
+  "ActualClean": {
+    "CompilerFilesRemoved": 33,
+    "ProtectedActualFilesUnchanged": 4,
+    "NestedFixtureFiles": 17,
+    "RootIniHashesUnchanged": true
+  },
+  "DebugStartupControlsClose": "PASS; no real INI copied; no Connect/report write/firmware/clipboard commands",
+  "ModalDialog": "PASS: owned native load/browse dialog opened/canceled",
+  "Security": "x64 static CRT/MFC and existing compiler optimization retained; PE 0x8160, VisualManager RTTI absent, no new dependency",
+  "NotRun": [
+    "Physical-device/protocol throughput",
+    "Visual/DPI inspection",
+    "Clean-PC",
+    "Win32",
+    "Unrelated firmware"
+  ],
+  "AppSourceChange": "Shared row-button image lists created once. Original Debug double-attachment assertion reproduced without the framework macro."
+}
