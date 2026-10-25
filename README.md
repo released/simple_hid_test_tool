@@ -5,29 +5,10 @@ Windows MFC HID 測試工具（64-byte payload），用於送命令、收回應�
 
 ![image](docs/images/main_window.jpg)
 
-## Release EXE size reduction (2026-10-25)
-
-Release x64 EXE: 2,821,632 -> 778,240 bytes.
-Unused MFC control registration is excluded; static runtime, security, actual
-controls and protocol/firmware features remain. The existing shared-image-list Debug defect is also fixed.
-Isolated startup, controls, Debug normal-close and 15 paired performance samples
-passed. See SELF_CHECK.md for scope, original timing failures and actual clean
-preservation. Physical-device, visual/DPI and clean-PC acceptance are not claimed.
-
-
-## Compiler-Only Clean
-
-`scripts/clean_mfc.bat` and the existing clean entry remove known compiler files
-only. Complete path/link preflight rejects reparse points before deletion;
-EXE/INI/DLL/data/log/evidence/unknowns are preserved even under obj/tests/verify.
-No additional manual setup is required.
 
 ## Build
 
 Repository: [released/simple_hid_test_tool](https://github.com/released/simple_hid_test_tool).
-舊網址 `released/HidTestTool` 會轉向同一個 HID repo，不能拿來上傳 TCP 工具。
-建置會自動檢查專案身分、未解決合併標記並安裝 pre-push 防錯推檢查，不需額外手動安裝。
-此檢查不會取代上傳前核對遠端實際內容；請勿使用 `--no-verify` 繞過。
 
 ```bat
 scripts\build_release.bat
@@ -183,7 +164,6 @@ On startup:
 - `VID:PID` capability row has contrast highlight for quick identification.
 - If multiple HID devices exist, verify `UsagePage/Usage` before connect.
 - `Reports` row includes `IN/OUT/FEAT` and current `ReportID=0xNN`.
-- Separate Report hint row is removed.
 
 ## TX Panel Notes
 
