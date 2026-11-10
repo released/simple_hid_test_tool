@@ -1,0 +1,15 @@
+{
+  "publication_enabled": true,
+  "repository": "released/simple_hid_test_tool",
+  "visibility": "PUBLIC",
+  "branch": "main",
+  "readme_title": "HidTestTool",
+  "identity_files": [
+    "README.md",
+    "HidTestTool.vcxproj"
+  ],
+  "delivery_files": [
+    "build/HidTestTool.exe",
+    "build/HidTestTool_commands_default.ini"
+  ]
+}

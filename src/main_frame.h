@@ -1,6 +1,7 @@
 #pragma once
 
 #include <afxwin.h>
+#include "tool_build_display.h"
 #include <afxext.h>
 
 #include "ui/device_bar.h"
@@ -13,6 +14,7 @@
 #include "config/command_config_manager.h"
 
 class CMainFrame : public CFrameWnd {
+    native_tool_ui::BuildIdentityLabel build_identity_;
 public:
     CMainFrame() = default;
 
